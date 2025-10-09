@@ -1,0 +1,51 @@
+<div class="frame-container" style="position: relative; width: 100%; height: 100vh;">
+  <p class="username-display mt-1 text-primary fw-bold">
+    <%= current_user.username.titleize %>
+  </p>
+  <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
+  <div class="holonews-container">
+    <div class="holonews-list-container mx-2" data-controller="toggle-content">
+      <% @holonews.each do |holonew| %>
+        <div class="holonew-item p-1 mb-1 <%= current_user.has_read?(holonew) ? 'bg-light' : 'bg-warning' %> rounded">
+          <h3><%= holonew.title %></h3>
+          <p>
+            <strong>Expéditeur :</strong> <%= holonew.sender_alias.presence || holonew.sender.username %>
+            <%= link_to new_holonew_path(reply_to: holonew.id), class: "ms-2 text-success", title: "Répondre" do %>
+              <i class="fas fa-reply"></i>
+            <% end %><br>
+            <small class="text-muted text-success">
+              Envoyé le <%= l(holonew.created_at, format: "%d/%m/%Y à %H:%M") %>
+            </small>
+          </p>
+
+          <% if holonew.content.length > 100 %>
+            <p class="text-truncate" data-toggle-content-target="content">
+              <%= holonew.content %>
+            </p>
+            <button class="btn btn-link p-0" data-action="click->toggle-content#toggle">
+              Voir plus
+            </button>
+          <% else %>
+            <p><%= holonew.content %></p>
+          <% end %>
+
+          <% if holonew.image.attached? %>
+            <div class="holonew-image mt-2">
+              <%= image_tag holonew.image, class: "img-fluid rounded" %>
+            </div>
+          <% end %>
+
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination m-3">
+      <%= link_to '« Précédent', holonews_path(page: @holonews.prev_page), class: "btn btn-outline-primary" if @holonews.prev_page %>
+      <%= link_to 'Suivant »', holonews_path(page: @holonews.next_page), class: "btn btn-outline-primary" if @holonews.next_page %>
+    </div>
+  </div>
+
+  <%= link_to "Retour", current_user.group.name == "MJ" ? mj_dashboard_path : root_path, class: "btn btn-outline-success go-back" %>
+  <%= link_to "Envoyer", new_holonew_path, class: "btn btn-outline-secondary go-create" %>
+</div>

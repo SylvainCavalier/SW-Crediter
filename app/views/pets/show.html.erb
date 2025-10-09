@@ -1,0 +1,285 @@
+<div class="frame-container" style="position: relative; width: 100%; height: 100vh; overflow-y: auto; overflow-x: hidden;">
+  <%= back_link((@pet.current_status&.name == "Mort") || (@pet.hp_current.to_i <= -10) ? graveyard_pets_path : pets_path) %>
+  <% is_dead = (@pet.current_status&.name == "Mort") || (@pet.hp_current.to_i <= -10) %>
+  <div class="pet-container <%= 'pet-dead' if is_dead %>">
+    <!-- Box principale -->
+    <div class="pet-box">
+      <!-- Section supérieure : Nom et Stats -->
+      <div class="row">
+        <div class="col-12 col-sm-6">
+          <ul class="list-group">
+            <li class="list-group-item">
+              <strong>Nom :</strong> <%= is_dead ? content_tag(:i, '', class: 'fa-solid fa-cross me-1') : ''.html_safe %><%= @pet.name %>
+            </li>
+            <li class="list-group-item">
+              <strong>Race :</strong> <%= @pet.race %>
+            </li>
+            <li class="list-group-item">
+              <strong>Âge :</strong> <%= @pet.age %> ans
+            </li>
+            <li class="list-group-item">
+              <strong>Taille :</strong> <%= @pet.size %> cm
+            </li>
+            <li class="list-group-item">
+              <strong>Poids :</strong> <%= @pet.weight %> kg
+            </li>
+            <% if @pet.force == true %>
+              <li class="list-group-item">
+                <strong>Sensible à la Force</strong>
+              </li>
+            <% end %>
+            <li class="list-group-item d-flex">
+              <strong>Res. Corp. :</strong>
+              <% pet_skill = @pet.pet_skills.find_by(skill: Skill.find_by(name: "Résistance Corporelle")) %>
+              <% base_stat = pet_skill&.mastery || 0 %>
+              <% bonus = pet_skill&.bonus || 0 %> <!-- Bonus -->
+              <% modifier = @pet.stat_modifiers[:resistance_corporelle] || 0 %> <!-- Modificateur -->
+              <%= base_stat %>D + <%= bonus %>
+              <div>
+                <!-- Icône de dé déclenchant la modale -->
+                <i class="fa-solid fa-dice" data-bs-toggle="modal" data-bs-target="#diceModal"
+                  data-dice-bonus-value="<%= bonus %>" data-dice-count="<%= base_stat %>"
+                  data-action="click->dice#prepareRoll"></i>
+              </div>
+            </li>
+
+            <li class="list-group-item d-flex">
+              <strong>Vitesse :</strong>
+              <% pet_skill = @pet.pet_skills.find_by(skill: Skill.find_by(name: "Vitesse")) %>
+              <% base_stat = pet_skill&.mastery || 0 %>
+              <% bonus = pet_skill&.bonus || 0 %> <!-- Bonus -->
+              <% modifier = @pet.stat_modifiers[:vitesse] || 0 %> <!-- Modificateur -->
+              <%= base_stat %>D + <%= bonus %>
+              <div>
+                <!-- Icône de dé déclenchant la modale -->
+                <i class="fa-solid fa-dice" data-bs-toggle="modal" data-bs-target="#diceModal"
+                  data-dice-bonus-value="<%= bonus %>" data-dice-count="<%= base_stat %>"
+                  data-action="click->dice#prepareRoll"></i>
+              </div>
+            </li>
+
+            <li class="list-group-item d-flex">
+              <strong>Précision :</strong>
+              <% pet_skill = @pet.pet_skills.find_by(skill: Skill.find_by(name: "Précision")) %>
+              <% base_stat = pet_skill&.mastery || 0 %>
+              <% bonus = pet_skill&.bonus || 0 %> <!-- Bonus -->
+              <% modifier = @pet.stat_modifiers[:accuracy] || 0 %> <!-- Modificateur -->
+              <%= base_stat %>D + <%= bonus %>
+              <div>
+                <!-- Icône de dé déclenchant la modale -->
+                <i class="fa-solid fa-dice" data-bs-toggle="modal" data-bs-target="#diceModal"
+                  data-dice-bonus-value="<%= bonus %>" data-dice-count="<%= base_stat %>"
+                  data-action="click->dice#prepareRoll"></i>
+              </div>
+            </li>
+
+            <li class="list-group-item d-flex">
+              <strong>Esquive :</strong>
+              <% pet_skill = @pet.pet_skills.find_by(skill: Skill.find_by(name: "Esquive")) %>
+              <% base_stat = pet_skill&.mastery || 0 %>
+              <% bonus = pet_skill&.bonus || 0 %> <!-- Bonus -->
+              <% modifier = @pet.stat_modifiers[:esquive] || 0 %> <!-- Modificateur -->
+              <%= base_stat %>D + <%= bonus %>
+              <div>
+                <!-- Icône de dé déclenchant la modale -->
+                <i class="fa-solid fa-dice" data-bs-toggle="modal" data-bs-target="#diceModal"
+                  data-dice-bonus-value="<%= bonus %>" data-dice-count="<%= base_stat %>"
+                  data-action="click->dice#prepareRoll"></i>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="col-12 col-sm-6 pet-status text-center p-2">
+          <%= image_tag(@pet.image.attached? ? @pet.image.variant(resize_to_limit: [300, 300]) : "petbase.png", class: "pet-image") %>
+          <div class="text-center d-flex justify-content-center align-items-center mt-1">
+            <% if current_user.pet_id == @pet.id && !is_dead %>
+              <div class="text-center mx-2">
+                <%= form_with url: heal_pet_path(@pet), method: :post, local: true, class: "d-flex align-items-center" do |f| %>
+                  <%= f.select :item_id, 
+                    current_user.user_inventory_objects.joins(:inventory_object)
+                    .where(inventory_objects: { category: 'soins' })
+                    .map { |uio| ["#{uio.inventory_object.name} (#{uio.quantity})", uio.inventory_object.id] },
+                    prompt: "Objet de soin",
+                    class: "form-select mx-2" %>
+                    
+                  <%= f.submit "Utiliser", class: "btn btn-outline-primary btn-sm ms-1" %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+          <div class="hp-bar-wrapper">
+            <div class="pet-hp-bar-container" data-controller="hp-bar" data-max-hp="<%= @pet.hp_max %>" data-current-hp="<%= @pet.hp_current %>">
+              <img src="<%= asset_path('bottom-bar.svg') %>" alt="Fond de la barre de vie" class="hp-bar-background">
+              <svg class="hp-bar-svg" viewBox="0 0 1001.46 140.26">
+                <defs>
+                  <clipPath id="hp-clip">
+                    <rect x="0" y="0" data-hp-bar-target="hpFill" width="<%= (1001.46 * [(@pet.hp_current.to_f / @pet.hp_max), 0].max).round %>" height="140.26" />
+                  </clipPath>
+                </defs>
+                <g id="hp-bar-layer" clip-path="url(#hp-clip)">
+                  <path 
+                    class="hp-fill" 
+                    d="M955.63,43.09l-10.4,7.77c-3.19,2.38-7.42,3.69-11.93,3.69h-161.43c-6.85,0-12.96-3.05-15.58-7.78-.29-.53-.52-1.06-.72-1.6l-7.61,5.69c-3.19,2.38-7.42,3.69-11.93,3.69h-161.43c-6.85,0-12.97-3.05-15.59-7.78-.2-.36-.36-.72-.52-1.08l-6.92,5.17c-3.19,2.38-7.42,3.69-11.93,3.69h-81.14c-6.85,0-12.97-3.05-15.59-7.78-.98-1.76-1.39-3.62-1.27-5.44-1.96-.58-3.77-1.44-5.34-2.55l-33.66-23.79h-207.95l-73.2,54.7c-7.9,5.9-18.4,9.15-29.58,9.15h-9.04l17.28,12.91c5.48,4.1,7.11,10.21,4.14,15.56-2.53,4.57-7.95,7.76-14.31,8.6l12.5,9.34h100.91l4.99-3.73c6.74-5.04,15.71-7.82,25.25-7.82h71.14c2.35,0,4.66-.71,6.32-1.96l13.03-9.74c6.75-5.04,15.71-7.81,25.25-7.81h321.46c1.21-.05,2.32-.08,3.36-.08h272.44c19.16,0,34.74-11.65,34.74-25.96,0-12-10.95-22.11-25.77-25.08l.03.02Z" 
+                    fill="#dd2f2f"
+                  />
+                </g>
+              </svg>
+              <div class="hp-text-container">
+                <div class="hp-text" data-hp-bar-target="hpText">
+                  PV : <span id="hp-value"><%= @pet.hp_current %></span> / <%= @pet.hp_max %>
+                </div>
+              </div>
+            </div>
+            <% if @pet.shield_max > 0 && !is_dead %>
+              <div class="shield-text-container d-flex" data-controller="shield-recharge-pet">
+                <div class="shield-text" data-shield-bar-target="shieldText">
+                  🛡️ Bouclier : <span id="shield-value"><%= @pet.shield_current %></span> / <%= @pet.shield_max %>
+                </div>
+                <!-- Bouton pour recharger le bouclier -->
+                <button class="btn btn-outline-primary btn-sm ms-1"
+                        data-action="click->shield-recharge-pet#openRechargePopup"
+                        data-bs-toggle="modal"
+                        data-bs-target="#genericModal"
+                        data-pet-id="<%= @pet.id %>"
+                        data-shield-max="<%= @pet.shield_max %>"
+                        data-shield-current="<%= @pet.shield_current %>">
+                  Rech.
+                </button>
+              </div>
+            <% end %>
+          </div>
+          <%= @pet.pet_statuses.includes(:status).map { |ps| ps.status.name }.join(", ") || "Non défini" %>
+        </div>
+      </div>
+
+      <!-- Section inférieure : Armes -->
+      <div class="row mt-4">
+        <div class="col-12 col-sm-6">
+          <div class="weapon-box">
+            <strong>Arme 1 :</strong> <%= @pet.weapon_1 %>
+            <br>
+            <strong>Dégâts 1 :</strong>
+            <% base_damage = @pet.damage_1 || 0 %>
+            <% modifier = @pet.stat_modifiers[:damage] || 0 %>
+            <%= base_damage %>DD + <%= @pet.damage_1_bonus || 0 %>
+            <div>
+              <!-- Icône de dé déclenchant la modale -->
+              <i class="fa-solid fa-dice" data-bs-toggle="modal" data-bs-target="#diceModal"
+                data-dice-count="<%= base_damage %>"
+                data-action="click->dice#prepareRoll"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6">
+          <div class="weapon-box">
+            <strong>Arme 2 :</strong> <%= @pet.weapon_2 %>
+            <br>
+            <strong>Dégâts 2 :</strong>
+            <% base_damage = @pet.damage_2 || 0 %>
+            <% modifier = @pet.stat_modifiers[:damage] || 0 %>
+            <%= base_damage %>DD + <%= @pet.damage_2_bonus || 0 %>
+            <div>
+              <!-- Icône de dé déclenchant la modale -->
+              <i class="fa-solid fa-dice" data-bs-toggle="modal" data-bs-target="#diceModal"
+                data-dice-count="<%= base_damage %>"
+                data-action="click->dice#prepareRoll"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section description / épitaphe -->
+      <div class="description-box mt-4">
+        <strong><%= is_dead ? 'Épitaphe' : 'Description' %> :</strong>
+        <p><%= @pet.description %></p>
+      </div>
+
+      <!-- Section utilisateur associé -->
+      <% if current_user.pet_id == @pet.id %>
+        <div class="row associated-box mt-4">
+          <!-- Colonne gauche : caractéristiques avec modificateurs -->
+          <div class="col-12 col-sm-6">
+            <ul class="list-group">
+              <li class="list-group-item">
+                <strong>Humeur :</strong> <%= @pet.mood_description %>
+              </li>
+              <li class="list-group-item">
+                <strong>Loyauté :</strong> <%= @pet.loyalty_description %>
+              </li>
+              <% unless @pet.category == "humanoïde" %>
+                <li class="list-group-item">
+                  <strong>Faim :</strong> <%= @pet.hunger_description %>
+                </li>
+              <% end %>
+              <li class="list-group-item">
+                <strong>Fatigue :</strong> <%= @pet.fatigue_description %>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Colonne droite : actions -->
+          <div class="col-12 col-sm-6">
+            <!--<div class="text-center mb-1">
+              <strong>Points d'action restants :</strong> <%#= current_user.pet_action_points %> / 10
+            </div>
+            <div class="actions d-flex flex-column text-center">
+              <%# case @pet.category %>-->
+              <%# when "animal" %>
+                <%#= button_to "Nourrir", perform_action_pet_path(@pet, action_type: "feed"), method: :post, class: "btn btn-outline-success mb-2" %>
+                <%#= button_to "Câlin", perform_action_pet_path(@pet, action_type: "cuddle"), method: :post, class: "btn btn-outline-success mb-2" %>
+                <%#= button_to "Jouer", perform_action_pet_path(@pet, action_type: "play"), method: :post, class: "btn btn-outline-success mb-2" %>
+                <%#= button_to "Gronder", perform_action_pet_path(@pet, action_type: "scold"), method: :post, class: "btn btn-outline-success mb-2" %>
+                <%#= button_to "Entrainer", perform_action_pet_path(@pet, action_type: "train"), method: :post, class: "btn btn-outline-primary mb-2" %>
+              <%# when "droïde" %>
+                <%#= button_to "Huiler", perform_action_pet_path(@pet, action_type: "oil"), method: :post, class: "btn btn-outline-success mb-2" %>
+                <%#= button_to "Vider Mémoire", perform_action_pet_path(@pet, action_type: "wipe_memory"), method: :post, class: "btn btn-outline-success mb-2" %>
+                <%#= button_to "Améliorer", perform_action_pet_path(@pet, action_type: "upgrade"), method: :post, class: "btn btn-outline-primary mb-2" %>
+              <%# when "humanoïde" %>
+                <%#= button_to "Complimenter", perform_action_pet_path(@pet, action_type: "compliment"), method: :post, class: "btn btn-outline-success mb-2" %>
+                <%#= button_to "Discuter", perform_action_pet_path(@pet, action_type: "chat"), method: :post, class: "btn btn-outline-success mb-2" %>
+                <%#= button_to "Frapper", perform_action_pet_path(@pet, action_type: "hit"), method: :post, class: "btn btn-outline-success mb-2" %>
+                <%#= button_to "Entrainer", perform_action_pet_path(@pet, action_type: "train"), method: :post, class: "btn btn-outline-primary mb-2" %>
+                <%# if @pet.force? && @pet.apprentice.nil? %>
+                  <%#= button_to "Prendre comme apprenti", create_apprentice_path(pet_id: @pet.id), method: :post, class: "btn btn-primary", data: { confirm: "Voulez-vous vraiment prendre ce pet comme apprenti ?" } %>
+                <%# end %>
+              <%# end %>
+<!--            </div>-->
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Boutons d'actions -->
+      <div class="action-buttons mt-4 text-center">
+        <% if current_user.pet_id == @pet.id %>
+          <%= link_to "Modifier", edit_pet_path(@pet), class: "btn btn-outline-secondary" %>
+          <%= button_tag "Dissocier", 
+            type: "button", 
+            class: "btn btn-outline-warning", 
+            data: {
+              bs_toggle: "modal",
+              bs_target: "#genericModal",
+              modal_title: "Confirmation de dissociation",
+              modal_message: "Êtes-vous sûr de vouloir dissocier ce familier ?",
+              modal_confirm_button: "Dissocier",
+              modal_confirm_action: "dissociate#confirm", # Action de dissociation
+              delete_path: dissociate_pet_path(@pet)
+            } %>
+        <% else %>
+          <%= button_to "Associer", associate_pet_path(@pet), method: :post, class: "btn btn-success", data: { confirm: "Associer ce familier ?" } %>
+        <% end %>
+          <%= button_tag "Supprimer", 
+            type: "button", 
+            class: "btn btn-outline-danger btn-sm", 
+            data: { 
+              bs_toggle: "modal", 
+              bs_target: "#genericModal", 
+              modal_title: "Confirmation de suppression", 
+              modal_message: "Êtes-vous sûr de vouloir supprimer ce familier ?", 
+              modal_confirm_button: "Supprimer", 
+              modal_confirm_action: "delete#confirm", # Action de suppression
+              delete_path: pet_path(@pet)
+            } %>
+      </div>
+    </div>
+  </div>
+</div>

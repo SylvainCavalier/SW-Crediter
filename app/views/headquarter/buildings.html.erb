@@ -1,0 +1,154 @@
+<div class="frame-container" style="position: relative; width: 100%; height: 100vh; overflow-y: auto; overflow-x: hidden;">
+  <div class="d-flex justify-content-between">
+    <%= link_to "Retour", headquarter_path, class: "btn btn-outline-secondary m-2" %>
+    <h1 class="text-center text-success">Bâtiments de la Base</h1>
+    <i class="fa-solid fa-building-flag"></i>
+  </div>
+
+  <div class="row m-2">
+    <% @buildings.group_by(&:category).each do |category, buildings| %>
+      <% current_building = buildings.max_by(&:level) %>
+
+      <div class="col-12 col-sd-12 col-md-6 mb-2">
+        <div class="card bg-dark text-light p-2 mb-2 shadow-lg rounded building-card">
+          <h3 class="text-success text-center"><%= current_building.name %> (Niveau <%= current_building.level %>)</h3>
+          
+          <% if current_building.level == 0 %>
+            <p class="text-warning text-center">Actuel : <strong>Rien</strong></p>
+            <p class="text-warning text-center">Ce bâtiment n'a pas encore été construit.</p>
+          <% else %>
+            <p class="text-success text-center"><%= current_building.description %></p>
+          <% end %>
+
+          <!-- Accordéon -->
+          <div class="accordion mt-3" id="accordion-<%= current_building.id %>">
+
+            <!-- Fonctionnalités -->
+            <div class="accordion-item bg-dark border-success">
+              <h2 class="accordion-header" id="heading-functions-<%= current_building.id %>">
+                <button class="accordion-button collapsed bg-dark text-success" type="button" data-bs-toggle="collapse" data-bs-target="#functions-<%= current_building.id %>" aria-expanded="false">
+                  Fonctionnalités
+                </button>
+              </h2>
+              <div id="functions-<%= current_building.id %>" class="accordion-collapse collapse" aria-labelledby="heading-functions-<%= current_building.id %>" data-bs-parent="#accordion-<%= current_building.id %>">
+                <div class="accordion-body text-light">
+                  <ul class="list-group">
+                    <% current_building.properties.each do |key, value| %>
+                      <li class="list-group-item bg-transparent text-light">
+                        <strong><%= key %> :</strong> <%= value %>
+                      </li>
+                    <% end %>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Liste du personnel -->
+            <div class="accordion-item bg-dark border-success">
+              <h2 class="accordion-header" id="heading-staff-<%= current_building.id %>">
+                <button class="accordion-button collapsed bg-dark text-success" type="button" data-bs-toggle="collapse" data-bs-target="#staff-<%= current_building.id %>" aria-expanded="false">
+                  Liste du Personnel
+                </button>
+              </h2>
+              <div id="staff-<%= current_building.id %>" class="accordion-collapse collapse" aria-labelledby="heading-staff-<%= current_building.id %>" data-bs-parent="#accordion-<%= current_building.id %>">
+                <div class="accordion-body text-light">
+
+                  <!-- Affichage du chef actuel -->
+                  <div class="mb-3">
+                    <% if current_building.chief_pet.present? %>
+                      <p class="text-warning">👑 Chef de bâtiment : <strong><%= current_building.chief_pet.name %></strong></p>
+                    <% else %>
+                      <p class="text-warning">Aucun chef assigné.</p>
+                    <% end %>
+                  </div>
+
+                  <!-- Liste des pets assignés -->
+                  <% if current_building.pets.any? %>
+                    <ul class="list-group">
+                      <% current_building.pets.each do |pet| %>
+                        <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+                          <div>
+                            <% if pet.image.attached? %>
+                              <%= image_tag pet.image.variant(resize_to_fill: [30, 30]), class: "rounded-circle me-1", alt: "Avatar de #{pet.name}" %>
+                            <% end %>
+                            <strong><%= pet.name %></strong> - <%= pet.race %>
+                          </div>
+                          <div class="d-flex align-items-center">
+                            <!-- Sélection automatique du chef -->
+                            <%= form_with url: set_chief_pet_building_path(current_building), method: :patch, local: true, data: { controller: "submit-on-change" } do |f| %>
+                              <%= f.radio_button :chief_pet_id, pet.id, checked: current_building.chief_pet_id == pet.id, data: { action: "change->submit-on-change#submit" } %>
+                              <span class="ms-1">Chef</span>
+                            <% end %>
+
+                            <%= button_to "❌", remove_pet_building_path(current_building, pet_id: pet.id), method: :delete, class: "btn btn-sm ms-2" %>                          
+                          </div>
+                        </li>
+                      <% end %>
+                    </ul>
+                  <% else %>
+                    <p class="text-warning">Aucun personnel assigné.</p>
+                  <% end %>
+
+                  <!-- Formulaire pour ajouter un personnel -->
+                  <%= form_with url: assign_pet_building_path(current_building), method: :patch, local: true do |f| %>
+                    <div class="align-items-center mt-3">
+                      <%= f.label :pet_id, "Choisir un personnel :", class: "me-2 text-success" %>
+                      <div class="d-flex">
+                        <%= f.select :pet_id, options_from_collection_for_select(Pet.order(:name), "id", "name"), { prompt: "Sélectionner un pet" }, class: "form-select bg-dark text-light border-success me-2" %>
+                        <%= f.submit "Assigner", class: "btn btn-outline-success btn-sm" %>
+                      </div>
+                    </div>
+                  <% end %>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Améliorations -->
+            <div class="accordion-item bg-dark border-success">
+              <h2 class="accordion-header" id="heading-upgrades-<%= current_building.id %>">
+                <button class="accordion-button collapsed bg-dark text-success" type="button" data-bs-toggle="collapse" data-bs-target="#upgrades-<%= current_building.id %>" aria-expanded="false">
+                  Améliorations
+                </button>
+              </h2>
+              <div id="upgrades-<%= current_building.id %>" class="accordion-collapse collapse" aria-labelledby="heading-upgrades-<%= current_building.id %>" data-bs-parent="#accordion-<%= current_building.id %>">
+                <div class="accordion-body text-light">
+                  <table class="table table-dark table-hover border-success">
+                    <thead>
+                      <tr class="text-success">
+                        <th>Lvl</th>
+                        <th>Description</th>
+                        <th>Prix</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% Building::BUILDING_DATA[category].each do |level, data| %>
+                        <% level = level.to_i %>
+                        <tr class="<%= 'bg-success text-dark fw-bold' if level == current_building.level %>">
+                          <td class="text-center"><%= level %></td>
+                          <td style="font-size: 0.8em;"><%= data["description"] %></td>
+                          <td class="text-center"><%= data["price"] %> crédits</td>
+                          <td class="text-center">
+                            <% if level == current_building.level %>
+                              <span class="badge bg-warning text-dark">Actuel</span>
+                            <% elsif level == current_building.level + 1 %>
+                              <%= button_to "Acheter", upgrade_building_path(current_building, level: level), method: :patch, class: "btn btn-outline-success btn-sm" %>
+                            <% else %>
+                              <span class="badge bg-secondary">Indisponible</span>
+                            <% end %>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- Fin de l'accordéon -->
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
