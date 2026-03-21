@@ -1,4 +1,4 @@
-<div class="frame-container" style="position: relative; width: 100%; height: 100vh;" data-controller="repair-scanner">
+<div class="frame-container" style="position: relative; width: 100%; height: 100vh;">
   <!-- Username -->
   <p class="username-display mt-1 text-primary fw-bold">
     <%= current_user.username.titleize %>
@@ -8,34 +8,29 @@
   <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
 
   <div class="repair-scan-container">
-    <h2 class="repair-title"><i class="fa-solid fa-wrench"></i> Scanner de Reparation</h2>
-    <p class="repair-subtitle">Scannez le QR Code de l'equipement a reparer</p>
+    <h2 class="repair-title"><i class="fa-solid fa-wrench"></i> Reparations</h2>
 
-    <!-- Zone de scan camera -->
-    <div class="scanner-viewport" data-repair-scanner-target="viewport">
-      <video data-repair-scanner-target="video" autoplay playsinline></video>
-      <div class="scanner-overlay">
-        <div class="scanner-corners">
-          <div class="corner top-left"></div>
-          <div class="corner top-right"></div>
-          <div class="corner bottom-left"></div>
-          <div class="corner bottom-right"></div>
-        </div>
-        <div class="scanner-line" data-repair-scanner-target="scanLine"></div>
+    <div class="scan-instructions mt-3">
+      <div class="text-center mb-3">
+        <i class="fa-solid fa-qrcode" style="font-size: 3rem; color: #1EDD88;"></i>
       </div>
+      <p class="text-light text-center" style="font-size: 0.9rem;">
+        Scannez le QR Code de l'equipement avec <strong>l'appareil photo</strong> de votre telephone.
+        Le lien s'ouvrira automatiquement dans l'application.
+      </p>
     </div>
 
-    <!-- Status -->
-    <p class="scanner-status" data-repair-scanner-target="status">
-      <i class="fa-solid fa-camera"></i> Initialisation de la camera...
-    </p>
+    <hr class="border-success opacity-50">
 
-    <!-- Fallback: saisie manuelle du code QR -->
+    <!-- Saisie manuelle du token -->
     <div class="manual-entry mt-3">
-      <p class="text-muted" style="font-size: 0.75rem;">Camera indisponible ? Entrez le code manuellement :</p>
+      <p class="text-muted text-center" style="font-size: 0.8rem;">
+        <i class="fa-solid fa-keyboard"></i> Ou entrez le code manuellement :
+      </p>
       <div class="d-flex gap-2 justify-content-center">
         <input type="text" class="form-control form-control-sm" style="max-width: 200px;"
-               placeholder="Code QR" data-repair-scanner-target="manualInput">
+               placeholder="Code QR" data-repair-scanner-target="manualInput"
+               data-controller="repair-scanner">
         <button class="btn btn-sm btn-outline-success" data-action="click->repair-scanner#manualSubmit">
           <i class="fa-solid fa-arrow-right"></i>
         </button>

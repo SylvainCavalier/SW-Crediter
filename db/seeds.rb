@@ -228,4 +228,13 @@ pazaak_cards.each do |card|
   end
 end
 
+puts "Creating repairs..."
+
+Repair.find_or_create_by!(qr_token: "2e3641baadd26652") do |r|
+  r.name = "Vaisseau"
+  r.description = "Réparation du vaisseau"
+  r.required_parts = ["Microprocesseur", "Valve d'électrocablage", "Rotobrosseur", "Commutateur ionique", "Rétropropulseur"]
+  r.code = "146322317"
+end
+
 puts "Seed terminé !"
