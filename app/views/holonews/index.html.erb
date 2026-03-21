@@ -46,6 +46,6 @@
     </div>
   </div>
 
-  <%= link_to "Retour", current_user.group.name == "MJ" ? mj_dashboard_path : root_path, class: "btn btn-outline-success go-back" %>
+  <%= link_to "Retour", root_path, class: "btn btn-outline-success go-back" %>
   <%= link_to "Envoyer", new_holonew_path, class: "btn btn-outline-secondary go-create" %>
 </div>

@@ -6,14 +6,13 @@
   <!-- Cadre principal SVG -->
   <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
 
-  <!-- Conteneur principal à deux colonnes -->
+  <!-- Conteneur principal -->
   <div class="content-container row" style="margin: 10vw;">
-    <!-- Colonne gauche : Transferts de crédits -->
-    <div class="col-12 col-sm-8">
+    <div class="col-12">
       <div class="text-center m-2">
         <!-- Affichage des crédits -->
         <p class="text-info fw-bold" style="font-size: 1.2rem; margin-bottom: 0;">
-          Crédits : <%= current_user.credits %> 💳
+          Crédits : <%= current_user.credits %>
         </p>
         <!-- Transfert des crédits -->
         <form action="<%= transactions_path %>" method="post">
@@ -27,25 +26,11 @@
 
             <% @transfer_users.each do |user| %>
               <% avatar_url = user.avatar.attached? ? url_for(user.avatar) : "" %>
-              <% if user.avatar.attached? %>
-                <%= image_tag user.avatar, size: "50x50", class: "rounded-circle" %>
-              <% else %>
-                <% puts "⛔ PAS D'AVATAR POUR #{user.username}" %>
-              <% end %>
-              <% data = {
-                value: user.username,
-                text: user.username,
-                avatar_url: avatar_url
-              } %>
-              <option value="<%= user.username %>" 
-                      data-avatar-url="<%= avatar_url %>" 
+              <option value="<%= user.username %>"
+                      data-avatar-url="<%= avatar_url %>"
                       data-text="<%= user.username %>">
                 <%= user.username %>
               </option>
-            <% end %>
-
-            <% if Headquarter.first %>
-              <option value="headquarter"><%= Headquarter.first.name %></option>
             <% end %>
           </select>
         </div>
@@ -61,21 +46,7 @@
       </form>
       </div>
     </div>
-
-    <!-- Colonne droite : XP -->
-    <div class="col-12 col-sm-4" data-controller="xp-spend" data-user-id="<%= current_user.id %>">
-      <div class="text-center m-2">
-        <!-- Affichage des XP -->
-        <p class="text-warning fw-bold xp" style="font-size: 1.2rem;" data-xp-spend-target="xp">
-          XP : <%= current_user.xp %>
-        </p>
-        <!-- Bouton pour dépenser de l'XP -->
-        <div>
-          <%= button_tag "Dépenser 1 XP", class: "btn btn-outline-primary btn-sm", data: { action: "xp-spend#decrement" } %>
-        </div>
-      </div>
-    </div>
   </div>
 
-  <%= link_to "Retour", current_user.group.name == "MJ" ? mj_dashboard_path : root_path, class: "btn btn-outline-secondary go-back" %>
+  <%= link_to "Retour", root_path, class: "btn btn-outline-secondary go-back" %>
 </div>
