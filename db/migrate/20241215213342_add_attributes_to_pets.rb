@@ -9,15 +9,6 @@ class AddAttributesToPets < ActiveRecord::Migration[7.1]
     # Ajouter la référence status sans contrainte NOT NULL pour l'instant
     add_reference :pets, :status, foreign_key: true, null: true
 
-    # Mettre à jour les données existantes avec le statut par défaut
-    reversible do |dir|
-      dir.up do
-        default_status = Status.find_by(name: "En forme") || Status.create!(name: "En forme", description: "En pleine santé", color: "#1EDD88")
-        Pet.where(status_id: nil).update_all(status_id: default_status.id)
-      end
-    end
-
-    # Appliquer la contrainte NOT NULL après la mise à jour des données
-    change_column_null :pets, :status_id, false
+    # Data migration removed — pets table will be dropped by cleanup migration
   end
 end
