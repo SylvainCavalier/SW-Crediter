@@ -1,0 +1,521 @@
+// ========================================
+// Repairs - QR Scanner & Repair Pages
+// ========================================
+
+.repair-scan-container,
+.repair-page-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+  width: 90%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(30, 221, 136, 0.3);
+    border-radius: 2px;
+  }
+}
+
+.repair-title {
+  font-family: 'Audiowide', cursive;
+  color: #1EDD88;
+  font-size: 1.3rem;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 10px rgba(30, 221, 136, 0.5);
+}
+
+.repair-subtitle {
+  color: rgba(30, 221, 136, 0.7);
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+// ---- Home button ----
+
+.repair-scan-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #1EDD88;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(30, 221, 136, 0.8);
+  }
+}
+
+// ---- Scanner ----
+
+.scanner-viewport {
+  width: 220px;
+  height: 220px;
+  margin: 0 auto 1rem;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #000;
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.scanner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.scanner-corners {
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 70%;
+
+  .corner {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: #1EDD88;
+    border-style: solid;
+    border-width: 0;
+
+    &.top-left { top: 0; left: 0; border-top-width: 3px; border-left-width: 3px; }
+    &.top-right { top: 0; right: 0; border-top-width: 3px; border-right-width: 3px; }
+    &.bottom-left { bottom: 0; left: 0; border-bottom-width: 3px; border-left-width: 3px; }
+    &.bottom-right { bottom: 0; right: 0; border-bottom-width: 3px; border-right-width: 3px; }
+  }
+}
+
+.scanner-line {
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #1EDD88, transparent);
+  box-shadow: 0 0 8px rgba(30, 221, 136, 0.8);
+  animation: scanAnimation 2s ease-in-out infinite;
+}
+
+@keyframes scanAnimation {
+  0%, 100% { top: 15%; }
+  50% { top: 75%; }
+}
+
+.scanner-status {
+  color: #1EDD88;
+  font-size: 0.8rem;
+  font-family: 'Audiowide', cursive;
+}
+
+.manual-entry {
+  .form-control {
+    background: rgba(2, 18, 28, 0.8);
+    border: 1px solid rgba(30, 221, 136, 0.3);
+    color: #1EDD88;
+    font-family: 'Audiowide', cursive;
+    font-size: 0.75rem;
+
+    &::placeholder { color: rgba(30, 221, 136, 0.4); }
+    &:focus {
+      border-color: #1EDD88;
+      box-shadow: 0 0 8px rgba(30, 221, 136, 0.3);
+    }
+  }
+}
+
+// ---- Repair Page ----
+
+.repair-object-card {
+  background: rgba(30, 221, 136, 0.05);
+  border: 1px solid rgba(30, 221, 136, 0.3);
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.repair-object-name {
+  font-family: 'Audiowide', cursive;
+  color: #1EDD88;
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 8px rgba(30, 221, 136, 0.4);
+}
+
+.repair-object-desc {
+  color: rgba(30, 221, 136, 0.7);
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.repair-already-done {
+  padding: 1.5rem;
+  color: #1EDD88;
+
+  i {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  p {
+    font-family: 'Audiowide', cursive;
+    font-size: 0.85rem;
+  }
+}
+
+.repair-parts-section {
+  text-align: left;
+  margin-bottom: 1rem;
+
+  h4 {
+    font-family: 'Audiowide', cursive;
+    color: #1EDD88;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.repair-parts-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    margin-bottom: 0.3rem;
+    background: rgba(30, 221, 136, 0.05);
+    border: 1px solid rgba(30, 221, 136, 0.15);
+    border-radius: 4px;
+    color: rgba(30, 221, 136, 0.85);
+    font-size: 0.8rem;
+
+    i {
+      color: rgba(30, 221, 136, 0.5);
+      font-size: 0.7rem;
+      animation: spin 4s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.repair-code-section {
+  margin-bottom: 1rem;
+
+  h4 {
+    font-family: 'Audiowide', cursive;
+    color: #1EDD88;
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+  }
+}
+
+.repair-code-hint {
+  color: rgba(30, 221, 136, 0.5);
+  font-size: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.repair-code-input-group {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.repair-code-input {
+  max-width: 200px;
+  background: rgba(2, 18, 28, 0.9) !important;
+  border: 1px solid rgba(30, 221, 136, 0.4) !important;
+  color: #1EDD88 !important;
+  font-family: 'Audiowide', cursive;
+  font-size: 1rem;
+  text-align: center;
+  letter-spacing: 3px;
+
+  &::placeholder {
+    color: rgba(30, 221, 136, 0.3);
+    letter-spacing: 1px;
+  }
+
+  &:focus {
+    border-color: #1EDD88 !important;
+    box-shadow: 0 0 12px rgba(30, 221, 136, 0.4) !important;
+  }
+}
+
+.repair-submit-btn {
+  font-family: 'Audiowide', cursive;
+  font-size: 0.8rem;
+}
+
+.repair-error {
+  color: #ff4444;
+  font-size: 0.75rem;
+  margin-top: 0.3rem;
+  min-height: 1.2em;
+  font-family: 'Audiowide', cursive;
+}
+
+.shake {
+  animation: shakeAnim 0.5s ease-in-out;
+}
+
+@keyframes shakeAnim {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+// ---- Loading Overlay ----
+
+.repair-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(ellipse at center, #0a1628 0%, #020c14 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.repair-loading-content {
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+}
+
+// Hologram rings
+.repair-hologram {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1.5rem;
+}
+
+.repair-hologram-ring {
+  position: absolute;
+  border: 2px solid rgba(30, 221, 136, 0.3);
+  border-radius: 50%;
+
+  &.ring-1 {
+    width: 120px;
+    height: 120px;
+    top: 0;
+    left: 0;
+    animation: rotateRing 3s linear infinite;
+    border-top-color: #1EDD88;
+    border-right-color: transparent;
+  }
+
+  &.ring-2 {
+    width: 90px;
+    height: 90px;
+    top: 15px;
+    left: 15px;
+    animation: rotateRing 2s linear infinite reverse;
+    border-bottom-color: #1EDD88;
+    border-left-color: transparent;
+  }
+
+  &.ring-3 {
+    width: 60px;
+    height: 60px;
+    top: 30px;
+    left: 30px;
+    animation: rotateRing 1.5s linear infinite;
+    border-top-color: #1EDD88;
+    border-left-color: transparent;
+  }
+}
+
+@keyframes rotateRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.repair-hologram-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.8rem;
+  color: #1EDD88;
+  animation: pulseGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; text-shadow: 0 0 10px rgba(30, 221, 136, 0.3); }
+  50% { opacity: 1; text-shadow: 0 0 25px rgba(30, 221, 136, 0.8); }
+}
+
+.repair-loading-text {
+  font-family: 'Audiowide', cursive;
+  color: #1EDD88;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(30, 221, 136, 0.5);
+  min-height: 1.5em;
+}
+
+.repair-progress-bar {
+  width: 80%;
+  height: 4px;
+  margin: 0 auto 0.8rem;
+  background: rgba(30, 221, 136, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid rgba(30, 221, 136, 0.2);
+}
+
+.repair-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #1EDD88, #00ff99);
+  border-radius: 2px;
+  transition: width 0.8s ease;
+  box-shadow: 0 0 8px rgba(30, 221, 136, 0.6);
+}
+
+.repair-loading-details {
+  color: rgba(30, 221, 136, 0.5);
+  font-size: 0.65rem;
+  font-family: 'Audiowide', cursive;
+  min-height: 1.2em;
+}
+
+// ---- Success Overlay ----
+
+.repair-success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(ellipse at center, #0a1628 0%, #020c14 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.repair-success-content {
+  text-align: center;
+}
+
+.repair-success-icon {
+  font-size: 4rem;
+  color: #1EDD88;
+  margin-bottom: 1rem;
+  animation: successPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  i {
+    filter: drop-shadow(0 0 20px rgba(30, 221, 136, 0.8));
+  }
+}
+
+@keyframes successPop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.repair-success-title {
+  font-family: 'Audiowide', cursive;
+  color: #1EDD88;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  letter-spacing: 2px;
+  text-shadow: 0 0 15px rgba(30, 221, 136, 0.6);
+}
+
+.repair-success-message {
+  background: rgba(30, 221, 136, 0.05);
+  border: 1px solid rgba(30, 221, 136, 0.3);
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-bottom: 0.5rem;
+
+  p {
+    color: rgba(30, 221, 136, 0.8);
+    font-size: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+}
+
+.gervatex-logo {
+  font-family: 'Audiowide', cursive;
+  font-size: 1.3rem;
+  color: #1EDD88;
+  letter-spacing: 6px;
+  margin-bottom: 0.8rem;
+  text-shadow: 0 0 15px rgba(30, 221, 136, 0.6);
+  border-bottom: 1px solid rgba(30, 221, 136, 0.2);
+  padding-bottom: 0.5rem;
+}
+
+.repair-credits-reward {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+
+  .credits-amount {
+    font-family: 'Audiowide', cursive;
+    font-size: 2.5rem;
+    color: #1EDD88;
+    text-shadow: 0 0 20px rgba(30, 221, 136, 0.8);
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  .credits-label {
+    font-family: 'Audiowide', cursive;
+    font-size: 0.9rem;
+    color: rgba(30, 221, 136, 0.6);
+    letter-spacing: 3px;
+  }
+}
+
+.credits-info {
+  color: rgba(30, 221, 136, 0.5) !important;
+  font-size: 0.7rem !important;
+  margin: 0 !important;
+}

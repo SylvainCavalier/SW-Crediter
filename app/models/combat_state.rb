@@ -1,2 +1,0 @@
-class CombatState < ApplicationRecord
-end

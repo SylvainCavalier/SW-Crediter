@@ -11,11 +11,9 @@
 // Your CSS partials
 @import "components/index";
 @import "pages/index";
-
-@import "pages/observation";
-@import "pages/lightsaber";
-@import "combat";
 @import "pazaak";
+@import "contacts";
+@import "repairs";
 
 @media screen and (orientation: portrait) {
   body {
@@ -197,7 +195,7 @@ span {
   left: 55%;  /* Centre horizontalement par rapport au screen */
   transform: translateX(-50%);
   z-index: 2;
-  font-size: 1.0rem; /* Ajuste la taille selon tes besoins */
+  font-size: 1.2rem; /* Ajuste la taille selon tes besoins */
   color: $success; /* Ajuste la couleur */
   width: 80%;
 }
@@ -293,7 +291,7 @@ span {
 /* Style pour le bouclier inactif */
 .shield-icon i {
   color: #00008B; /* Bleu foncé pour inactif */
-  font-size: 3rem;
+  font-size: 5rem;
   transition: all 0.3s ease;
 }
 
@@ -416,7 +414,7 @@ span {
 
 .hp-bar-container {
   position: absolute;
-  bottom: 25%;
+  bottom: 27%;
   left: 10%;
   width: 40vw;
   height: auto;

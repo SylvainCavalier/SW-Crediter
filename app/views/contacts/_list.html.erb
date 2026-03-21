@@ -1,0 +1,22 @@
+<div class="contacts-list">
+  <% if contacts.any? %>
+    <ul class="list-group">
+      <% contacts.each do |contact| %>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <% if contact.avatar.attached? %>
+              <%= image_tag contact.avatar, class: "avatar-small", style: "width: 30px; height: 30px; border-radius: 50%; object-fit: cover;" %>
+            <% else %>
+              <div class="avatar-placeholder" style="width: 30px; height: 30px; border-radius: 50%; background-color: #ccc;"></div>
+            <% end %>
+            <strong><%= contact.username %></strong>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="alert alert-info">
+      Aucun contact pour le moment. Ajoutez-en un ci-dessus !
+    </div>
+  <% end %>
+</div>

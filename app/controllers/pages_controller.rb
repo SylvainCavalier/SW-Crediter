@@ -2,23 +2,28 @@ class PagesController < ApplicationController
   before_action :authenticate_user!
 
   def home
-    @patch_equipped = current_user.equipped_patch.present?
-    @active_injection_object = current_user.active_injection_object
+    @user = current_user
     @unread_holonews_count = current_user.holonew_reads.where(read: false).count
-    @headquarter = Headquarter.first
   end
 
   def team
-    @players = User.includes(:race, :classe_perso, :pet, :statuses, :avatar_attachment)
+    @players = User.includes(:avatar_attachment)
                    .joins(:group).where(groups: { name: "PJ" })
                    .order(:username)
   end
 
-  def mj
+  def avatar_upload
+    @user = User.find(params[:id])
+    if @user.update(avatar_params)
+      redirect_to root_path, notice: "Avatar mis à jour avec succès !"
+    else
+      redirect_to root_path, alert: "Erreur lors de l'upload."
+    end
   end
 
-  def rules
-    file_path = Rails.root.join("app", "views", "pages", "rules.md")
-    @rules_content = File.read(file_path).then { |content| Kramdown::Document.new(content).to_html }
+  private
+
+  def avatar_params
+    params.require(:user).permit(:avatar)
   end
 end

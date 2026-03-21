@@ -1,0 +1,23 @@
+<div class="contacts-modal" id="contacts-modal">
+  <div class="modal-content">
+    <h2>Mes Contacts</h2>
+    
+    <!-- Formulaire pour ajouter un contact -->
+    <div class="add-contact-section mb-3">
+      <%= form_with url: add_contacts_path, method: :post, local: true, class: "d-flex gap-2" do |f| %>
+        <%= f.text_field :contact_username, placeholder: "Nom d'utilisateur exact", class: "form-control", required: true %>
+        <%= f.submit "Ajouter", class: "btn btn-sm btn-outline-success" %>
+      <% end %>
+      <div id="contact-error"></div>
+    </div>
+
+    <!-- Liste des contacts -->
+    <div id="contacts-list">
+      <%= render "contacts/list", contacts: @contacts %>
+    </div>
+
+    <div class="mt-3">
+      <%= link_to "Fermer", "#", class: "btn btn-sm btn-outline-secondary", data: { dismiss: "modal" } %>
+    </div>
+  </div>
+</div>

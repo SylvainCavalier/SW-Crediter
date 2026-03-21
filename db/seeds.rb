@@ -18,6 +18,7 @@ autodidact = ClassePerso.find_or_create_by!(name: "Autodidacte", description: "U
 mercenary = ClassePerso.find_or_create_by!(name: "Mercenaire", description: "Un combattant à louer.")
 cyber_engineer = ClassePerso.find_or_create_by!(name: "Cyber-ingénieur", description: "Spécialiste des technologies avancées.")
 smuggler = ClassePerso.find_or_create_by!(name: "Contrebandier", description: "Expert dans l'art de la contrebande.")
+technicien = ClassePerso.find_or_create_by!(name: "Technicien", description: "Specialiste en reparation et maintenance d'equipements.")
 
 puts "Creating statuses..."
 statuses = [
@@ -108,6 +109,22 @@ players.each do |player_attrs|
   else
     puts "#{player_attrs[:username]} déjà existant, passage..."
   end
+end
+
+# Agent B-47 (Technicien pour les reparations)
+existing_b47 = User.find_by("LOWER(username) = ?", "agent b-47")
+unless existing_b47
+  puts "Création de Agent B-47..."
+  User.create!(
+    username: "Agent B-47",
+    email: "agentb47@rpg.com",
+    password: "password",
+    group: group3,
+    credits: 100
+  )
+  puts "Agent B-47 créé avec succès"
+else
+  puts "Agent B-47 déjà existant, passage..."
 end
 
 puts "Adding new skills..."
