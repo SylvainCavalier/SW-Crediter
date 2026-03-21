@@ -49,7 +49,7 @@ class RepairsController < ApplicationController
   private
 
   def require_technicien
-    unless current_user.username == "Agent B-47"
+    unless current_user.username.downcase == "agent b-47"
       redirect_to root_path, alert: "Seuls les Techniciens peuvent acceder aux reparations."
     end
   end
