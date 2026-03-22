@@ -1,0 +1,66 @@
+<div class="frame-container" style="position: relative; width: 100%; height: 100vh;">
+  <p class="username-display mt-1 text-primary fw-bold">
+    <%= current_user.username.titleize %>
+  </p>
+  <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
+
+  <div class="content-container row" style="margin: 6vw; overflow-y: auto; max-height: 75vh;">
+    <div class="col-12">
+      <div class="m-2 text-center">
+
+        <h6 class="text-danger mb-3">
+          <i class="fa-solid fa-ban"></i>
+          DEMANDE TEMPORAIREMENT IRRECEVABLE
+        </h6>
+
+        <div class="border border-danger rounded p-3 mb-3" style="background-color: rgba(220, 53, 69, 0.1);">
+          <p class="text-warning mb-2" style="font-size: 0.85rem;">
+            <strong>AVIS OFFICIEL DU BUREAU DES ALLOCATIONS BUDGÉTAIRES</strong>
+          </p>
+
+          <p class="text-info" style="font-size: 0.75rem; text-align: justify;">
+            Conformément à l'<strong>Article 7742-F, alinéa 3</strong> du Code Administratif Galactique,
+            à la <strong>Directive Sénatoriale n°2247-B</strong> relative à la régulation des flux budgétaires
+            inter-systèmes, ainsi qu'à l'<strong>Amendement 12-C/bis</strong> du Comité de Supervision des
+            Allocations Républicaines (adopté lors de la 4ème session extraordinaire du 3ème cycle de l'année
+            galactique standard 7977), toute demande de subvention doit respecter un délai de carence
+            obligatoire entre deux soumissions successives.
+          </p>
+
+          <p class="text-info" style="font-size: 0.75rem; text-align: justify;">
+            Ce délai, fixé à <strong>4 cycles horaires standards</strong> par le
+            <strong>Décret Exécutif n°1138-A</strong> du Chancelier Suprême (ratifié par le Sénat Galactique
+            à la majorité des deux tiers, conformément à la procédure prévue par l'Article 88 de la
+            Constitution de la République), ne peut en aucun cas être réduit, annulé ou contourné,
+            sauf dérogation exceptionnelle accordée par le Bureau de Dérogation aux Dérogations
+            (formulaire GR-9981-D/rev.12, disponible uniquement sur Coruscant, bâtiment Besh-4, niveau 2891,
+            guichet 7, les jours pairs, entre 10h et 10h15 heure standard).
+          </p>
+
+          <hr class="border-secondary">
+
+          <p class="text-danger" style="font-size: 0.9rem;">
+            <i class="fa-solid fa-hourglass-half"></i>
+            Temps restant avant nouvelle demande :
+            <strong><%= @remaining_time[:hours] %>h <%= "%02d" % @remaining_time[:minutes] %>min</strong>
+          </p>
+
+          <p class="text-secondary" style="font-size: 0.65rem;">
+            Toute tentative de contournement de ce délai est passible d'une amende de 25 000 crédits
+            et d'une interdiction temporaire d'accès aux services publics galactiques
+            (Loi n°447-B du Code Pénal Galactique, Chapitre XII, Section 3, Paragraphe 7, Sous-paragraphe b).
+          </p>
+
+          <p class="text-secondary" style="font-size: 0.6rem; font-style: italic;">
+            Référence du dossier : BUR-ALLOC-<%= SecureRandom.hex(6).upcase %><br>
+            Horodatage de dernière demande : <%= current_user.last_subsidy_at&.strftime("%d/%m/%Y à %H:%M:%S") %> (heure de Coruscant)<br>
+            Agent traitant : Droïde Bureaucratique série RA-7 — Matricule BQ-<%= rand(1000..9999) %>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <%= link_to "Retour", new_transaction_path, class: "btn btn-outline-secondary go-back", style: "font-size: 0.7rem;" %>
+</div>

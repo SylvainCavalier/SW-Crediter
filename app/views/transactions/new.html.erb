@@ -24,13 +24,30 @@
           <select name="transaction[receiver_username]" id="transaction_receiver_username" class="form-control" data-controller="tom-select">
             <option value="">Sélectionnez un destinataire</option>
 
-            <% @transfer_users.each do |user| %>
-              <% avatar_url = user.avatar.attached? ? url_for(user.avatar) : "" %>
-              <option value="<%= user.username %>"
-                      data-avatar-url="<%= avatar_url %>"
-                      data-text="<%= user.username %>">
-                <%= user.username %>
-              </option>
+            <% if @contact_users.any? %>
+              <optgroup label="Contacts">
+                <% @contact_users.each do |user| %>
+                  <% avatar_url = user.avatar.attached? ? url_for(user.avatar) : "" %>
+                  <option value="<%= user.username %>"
+                          data-avatar-url="<%= avatar_url %>"
+                          data-text="<%= user.username %>">
+                    <%= user.username %>
+                  </option>
+                <% end %>
+              </optgroup>
+            <% end %>
+
+            <% if @pnj_users.any? %>
+              <optgroup label="Services">
+                <% @pnj_users.each do |user| %>
+                  <% avatar_url = user.avatar.attached? ? url_for(user.avatar) : "" %>
+                  <option value="<%= user.username %>"
+                          data-avatar-url="<%= avatar_url %>"
+                          data-text="<%= user.username %>">
+                    <%= user.username %>
+                  </option>
+                <% end %>
+              </optgroup>
             <% end %>
           </select>
         </div>
@@ -48,5 +65,8 @@
     </div>
   </div>
 
-  <%= link_to "Retour", root_path, class: "btn btn-outline-secondary go-back" %>
+  <div class="transaction-bottom-buttons d-flex gap-2">
+    <%= link_to "Retour", root_path, class: "btn btn-outline-secondary" %>
+    <%= link_to "Subventions de la République", new_subsidy_path, class: "btn btn-outline-warning btn-sm" %>
+  </div>
 </div>

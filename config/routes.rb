@@ -22,6 +22,11 @@ Rails.application.routes.draw do
   # Transferts de crédits
   resources :transactions, only: [:new, :create]
 
+  # Subventions de la République (Easter egg bureaucratique)
+  get 'subsidies', to: 'subsidies#new', as: :new_subsidy
+  get 'subsidies/form', to: 'subsidies#form', as: :subsidy_form
+  post 'subsidies/submit', to: 'subsidies#submit', as: :submit_subsidy
+
   # Push notifications
   resources :subscriptions, only: [:create, :destroy]
 

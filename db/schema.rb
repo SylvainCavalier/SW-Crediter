@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_21_000000) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_22_143846) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -208,6 +208,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_21_000000) do
     t.bigint "group_id", null: false
     t.jsonb "pazaak_deck", default: []
     t.jsonb "contacts", default: [], null: false
+    t.datetime "last_subsidy_at"
     t.index ["contacts"], name: "index_users_on_contacts", using: :gin
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["group_id"], name: "index_users_on_group_id"

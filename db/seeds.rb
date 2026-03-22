@@ -18,6 +18,19 @@ unless User.find_by("LOWER(username) = ?", "agent b-47")
   puts "Agent B-47 créé"
 end
 
+# PNJ (contacts pré-enregistrés)
+[
+  { username: "Technicien Comm", email: "techcomm@sw-gn.com" },
+  { username: "Cantinier", email: "cantinier@sw-gn.com" },
+  { username: "Droïde de Service", email: "droide@sw-gn.com" },
+  { username: "Jawas", email: "jawas@sw-gn.com" }
+].each do |pnj|
+  unless User.find_by("LOWER(username) = ?", pnj[:username].downcase)
+    User.create!(username: pnj[:username], email: pnj[:email], password: "pnjpassword", group: group_pnj, credits: 0)
+    puts "#{pnj[:username]} (PNJ) créé"
+  end
+end
+
 puts "Creating inventory objects..."
 
 # Soins
@@ -235,6 +248,48 @@ Repair.find_or_create_by!(qr_token: "2e3641baadd26652") do |r|
   r.description = "Réparation du vaisseau"
   r.required_parts = ["Microprocesseur", "Valve d'électrocablage", "Rotobrosseur", "Commutateur ionique", "Rétropropulseur"]
   r.code = "146322317"
+end
+
+Repair.find_or_create_by!(qr_token: "b640510b9d12c8d9") do |r|
+  r.name = "Cuve a bacta"
+  r.description = "La cuve a bacta est endommagee et necessite le remplacement de sa bombonne pour fonctionner a nouveau."
+  r.required_parts = ["Bombonne de bacta"]
+  r.code = "256"
+end
+
+Repair.find_or_create_by!(qr_token: "570d88da272fddc3") do |r|
+  r.name = "Cuve a bacta (2e reparation)"
+  r.description = "La cuve a bacta necessite une seconde intervention. Un silanbloc electromagnetique doit etre insere pour stabiliser le systeme."
+  r.required_parts = ["Silanbloc electromagnetique"]
+  r.code = "239"
+end
+
+Repair.find_or_create_by!(qr_token: "c0b1d07871b6f6bf") do |r|
+  r.name = "Tireuse a biere"
+  r.description = "La tireuse a biere est hors service. Une demi-valve vibroide doit etre remplacee pour retablir le debit."
+  r.required_parts = ["Demi-valve vibroide"]
+  r.code = "51"
+end
+
+Repair.find_or_create_by!(qr_token: "fffa6e1037b13293") do |r|
+  r.name = "Antenne de communication"
+  r.description = "L'antenne de communication est defaillante. Plusieurs composants doivent etre remplaces pour restaurer les transmissions."
+  r.required_parts = ["Communicateur ionique", "Carte mere avec programme de transmission", "Electro-rivet"]
+  r.code = "3811612"
+end
+
+Repair.find_or_create_by!(qr_token: "2483577ff211e7d9") do |r|
+  r.name = "Vaporateur"
+  r.description = "Le vaporateur ne fonctionne plus. Le piston quantomagnetique doit etre remplace."
+  r.required_parts = ["Piston quantomagnetique"]
+  r.code = "434"
+end
+
+Repair.find_or_create_by!(qr_token: "85556390454417a8") do |r|
+  r.name = "Four Entrique"
+  r.description = "Le four entrique est en panne. La magneto-charniere doit etre remplacee."
+  r.required_parts = ["Magneto-charniere"]
+  r.code = "637"
 end
 
 puts "Seed terminé !"

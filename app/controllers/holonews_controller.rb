@@ -41,10 +41,11 @@ class HolonewsController < ApplicationController
     # Validation spécifique pour les PJ : vérifier que le destinataire est un contact
     if current_user.group.name == "PJ" && params[:target_user].present?
       target_user_id = params[:target_user].to_i
-      
-      unless current_user.is_contact?(target_user_id)
+      target_user = User.find_by(id: target_user_id)
+
+      unless current_user.is_contact?(target_user_id) || target_user&.is_pnj?
         respond_to do |format|
-          format.html do 
+          format.html do
             redirect_to new_holonew_path, alert: "Vous ne pouvez envoyer des messages qu'à vos contacts."
           end
         end

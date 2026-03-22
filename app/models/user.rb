@@ -75,6 +75,14 @@ class User < ApplicationRecord
     contacts.include?(user_id.to_i) if contacts.present?
   end
 
+  def is_pnj?
+    group.name == "PNJ"
+  end
+
+  def self.pnj_contacts
+    joins(:group).where(groups: { name: "PNJ" })
+  end
+
   def name
     username
   end

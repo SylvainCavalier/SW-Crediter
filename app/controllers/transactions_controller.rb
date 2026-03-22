@@ -19,6 +19,11 @@ class TransactionsController < ApplicationController
       render :new, status: :unprocessable_entity and return
     end
 
+    unless current_user.is_contact?(receiver.id) || receiver.is_pnj?
+      flash.now[:alert] = 'Vous ne pouvez transférer des crédits qu\'à vos contacts.'
+      render :new, status: :unprocessable_entity and return
+    end
+
     @transaction = Transaction.new(transaction_params)
     @transaction.sender = current_user
     @transaction.receiver = receiver
@@ -51,8 +56,15 @@ class TransactionsController < ApplicationController
   end
 
   def set_transfer_users
-    @transfer_users = User.where.not(id: current_user.id)
-                          .includes(avatar_attachment: :blob)
-                          .order(:username)
+    contact_ids = current_user.contacts || []
+    @contact_users = User.where(id: contact_ids)
+                         .where.not(id: current_user.id)
+                         .includes(avatar_attachment: :blob)
+                         .order(:username)
+    @pnj_users = User.pnj_contacts
+                     .where.not(id: current_user.id)
+                     .includes(avatar_attachment: :blob)
+                     .order(:username)
+    @transfer_users = @contact_users + @pnj_users
   end
 end

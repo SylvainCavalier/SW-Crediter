@@ -1,0 +1,346 @@
+<div style="position: relative; width: 100%; height: 100vh; overflow-y: auto; background-color: #000;" data-controller="subsidy-form">
+
+  <div class="p-3" style="max-width: 95%; margin: 0 auto;">
+
+    <h6 class="text-warning text-center mb-2">
+      <i class="fa-solid fa-file-lines"></i>
+      FORMULAIRE RÉPUBLICAIN DE DEMANDE DE SUBVENTION
+    </h6>
+    <p class="text-secondary text-center" style="font-size: 0.6rem;">
+      Formulaire GR-7742-B/rev.38 — Bureau des Allocations Budgétaires du Secteur Externe — Coruscant
+    </p>
+
+    <!-- Message de reset (caché par défaut) — overlay centré -->
+    <div data-subsidy-form-target="resetMessage" class="d-none"
+         style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.8);">
+      <div class="alert alert-danger text-center m-3" style="font-size: 0.85rem; max-width: 90%;">
+        <strong><i class="fa-solid fa-triangle-exclamation"></i> ERREUR DE CONFORMITÉ</strong><br><br>
+        <span data-subsidy-form-target="resetReason"></span><br><br>
+        <small>Votre formulaire a été réinitialisé. Veuillez recommencer la procédure.</small>
+      </div>
+    </div>
+
+    <%= form_tag submit_subsidy_path, method: :post, id: "subsidy-form", data: { subsidy_form_target: "form" } do %>
+
+      <%# ═══════════════════════════════════════════ %>
+      <%# SECTION 1 : Identification du demandeur %>
+      <%# ═══════════════════════════════════════════ %>
+      <fieldset class="border border-secondary rounded p-2 mb-2">
+        <legend class="text-info" style="font-size: 0.8rem;">Section 1 — Identification du Demandeur</legend>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">1.1 — Nom complet (tel qu'inscrit au Registre Galactique des Citoyens)</label>
+          <input type="text" class="form-control form-control-sm" required />
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">1.2 — Nom de naissance (si différent du nom d'usage)</label>
+          <input type="text" class="form-control form-control-sm" />
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">1.3 — Numéro d'Identification Galactique (NIG) — 16 caractères alphanumériques</label>
+          <input type="text" class="form-control form-control-sm" maxlength="16" minlength="16" pattern="[A-Za-z0-9]{16}" required placeholder="Ex: AX7B92KL04MN5QR1" title="Le NIG doit contenir exactement 16 caractères alphanumériques" />
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">1.4 — Planète de naissance</label>
+          <input type="text" class="form-control form-control-sm" required />
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">1.5 — Secteur galactique de résidence actuelle</label>
+          <select class="form-control form-control-sm" required>
+            <option value="">— Sélectionnez —</option>
+            <option value="noyau">Mondes du Noyau</option>
+            <option value="colonies">Les Colonies</option>
+            <option value="bordure_interieure">Bordure Intérieure</option>
+            <option value="region_expansion">Région d'Expansion</option>
+            <option value="bordure_mediane">Bordure Médiane</option>
+            <option value="bordure_exterieure">Bordure Extérieure</option>
+            <option value="espace_hutt">Espace Hutt</option>
+            <option value="regions_inconnues">Régions Inconnues</option>
+          </select>
+        </div>
+
+        <%# PIÈGE 1 : Espace Sauvage = formulaire reset %>
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">1.6 — Avez-vous séjourné dans l'Espace Sauvage au cours des 12 derniers cycles standards ?</label>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="espace_sauvage" value="oui"
+                   data-action="change->subsidy-form#trapEspaceSauvage">
+            <label class="form-check-label text-success" style="font-size: 0.75rem;">Oui</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="espace_sauvage" value="non">
+            <label class="form-check-label text-success" style="font-size: 0.75rem;">Non</label>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">1.7 — Espèce (selon la classification du Bureau de Recensement Galactique)</label>
+          <input type="text" class="form-control form-control-sm" required />
+        </div>
+      </fieldset>
+
+      <%# ═══════════════════════════════════════════ %>
+      <%# SECTION 2 : Objet de la demande %>
+      <%# ═══════════════════════════════════════════ %>
+      <fieldset class="border border-secondary rounded p-2 mb-2">
+        <legend class="text-info" style="font-size: 0.8rem;">Section 2 — Objet de la Demande de Subvention</legend>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">2.1 — Motif de la demande (cochez toutes les cases applicables)</label>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="motif_mission">
+            <label class="form-check-label text-success" style="font-size: 0.7rem;" for="motif_mission">Mission officielle mandatée par le Sénat</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="motif_humanitaire">
+            <label class="form-check-label text-success" style="font-size: 0.7rem;" for="motif_humanitaire">Aide humanitaire inter-systèmes</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="motif_recherche">
+            <label class="form-check-label text-success" style="font-size: 0.7rem;" for="motif_recherche">Recherche scientifique approuvée</label>
+          </div>
+          <%# PIÈGE 2 : Enrichissement personnel %>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="motif_enrichissement"
+                   data-action="change->subsidy-form#trapEnrichissement">
+            <label class="form-check-label text-success" style="font-size: 0.7rem;" for="motif_enrichissement">Enrichissement personnel</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="motif_reparation">
+            <label class="form-check-label text-success" style="font-size: 0.7rem;" for="motif_reparation">Réparation de vaisseau endommagé en service</label>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">2.2 — Montant demandé (en crédits républicains)</label>
+          <input type="number" class="form-control form-control-sm" value="<%= @requested_amount %>" readonly />
+          <small class="text-secondary" style="font-size: 0.6rem;">Note : conformément à la Directive 7742-C, le montant alloué sera déterminé par la Commission, indépendamment de votre demande.</small>
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">2.3 — Description détaillée du besoin (minimum 20 caractères)</label>
+          <textarea class="form-control form-control-sm" rows="2" minlength="20" required placeholder="Décrivez votre besoin avec précision..." title="Minimum 20 caractères requis"></textarea>
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">2.4 — Code de priorité de la mission</label>
+          <select class="form-control form-control-sm" required
+                  data-action="change->subsidy-form#trapPriorite">
+            <option value="">— Sélectionnez —</option>
+            <option value="aurek">Aurek (Critique)</option>
+            <option value="besh">Besh (Haute)</option>
+            <option value="cresh">Cresh (Normale)</option>
+            <option value="dorn">Dorn (Faible)</option>
+            <%# PIÈGE 3 : Priorité Zerek %>
+            <option value="zerek">Zerek (Aucune)</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <%# ═══════════════════════════════════════════ %>
+      <%# SECTION 3 : Conformité Administrative %>
+      <%# ═══════════════════════════════════════════ %>
+      <fieldset class="border border-secondary rounded p-2 mb-2">
+        <legend class="text-info" style="font-size: 0.8rem;">Section 3 — Conformité et Vérifications Administratives</legend>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">3.1 — Êtes-vous actuellement sous le coup d'une enquête du Bureau de Conformité Fiscale ?</label>
+          <div class="form-check form-check-inline">
+            <%# PIÈGE 4 : Sous enquête = reset %>
+            <input class="form-check-input" type="radio" name="enquete" value="oui"
+                   data-action="change->subsidy-form#trapEnquete">
+            <label class="form-check-label text-success" style="font-size: 0.75rem;">Oui</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="enquete" value="non">
+            <label class="form-check-label text-success" style="font-size: 0.75rem;">Non</label>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">3.2 — Numéro de dossier fiscal inter-systèmes (NDFIS)</label>
+          <input type="text" class="form-control form-control-sm" required placeholder="Format: XX-000-XX-000" pattern="[A-Za-z]{2}-[0-9]{3}-[A-Za-z]{2}-[0-9]{3}" title="Format attendu : XX-000-XX-000 (ex: AB-123-CD-456)" />
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">3.3 — Nom de votre référent administratif au Bureau des Subventions</label>
+          <input type="text" class="form-control form-control-sm" placeholder="Si inconnu, inscrivez 'NC'" />
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">3.4 — Avez-vous déjà bénéficié d'une subvention républicaine au cours des 5 derniers cycles standards ?</label>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="subvention_anterieure" value="oui">
+            <label class="form-check-label text-success" style="font-size: 0.75rem;">Oui</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="subvention_anterieure" value="non">
+            <label class="form-check-label text-success" style="font-size: 0.75rem;">Non</label>
+          </div>
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">3.5 — Si oui, indiquez le numéro de référence de la subvention précédente</label>
+          <input type="text" class="form-control form-control-sm" placeholder="Format: SUB-XXXXX-XXXXX" />
+        </div>
+
+        <%# PIÈGE 5 : Affiliation séparatiste %>
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">3.6 — Êtes-vous, ou avez-vous été, affilié(e) au mouvement Séparatiste ?</label>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="separatiste" value="oui"
+                   data-action="change->subsidy-form#trapSeparatiste">
+            <label class="form-check-label text-success" style="font-size: 0.75rem;">Oui</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="separatiste" value="non">
+            <label class="form-check-label text-success" style="font-size: 0.75rem;">Non</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <%# ═══════════════════════════════════════════ %>
+      <%# SECTION 4 : Justificatifs et Déclarations %>
+      <%# ═══════════════════════════════════════════ %>
+      <fieldset class="border border-secondary rounded p-2 mb-2">
+        <legend class="text-info" style="font-size: 0.8rem;">Section 4 — Déclarations Obligatoires</legend>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">4.1 — Nombre de personnes à charge (inclure droïdes de catégorie 3 ou supérieure)</label>
+          <input type="number" class="form-control form-control-sm" min="0" required />
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">4.2 — Classe de votre vaisseau principal (si applicable)</label>
+          <select class="form-control form-control-sm">
+            <option value="">— Sélectionnez —</option>
+            <option value="chasseur">Chasseur léger</option>
+            <option value="cargo">Cargo léger</option>
+            <option value="corvette">Corvette</option>
+            <option value="fregate">Frégate</option>
+            <option value="croiseur">Croiseur</option>
+            <option value="aucun">Aucun vaisseau</option>
+          </select>
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">4.3 — Revenu annuel estimé (en crédits républicains)</label>
+          <input type="number" class="form-control form-control-sm" required />
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">4.4 — Listez l'ensemble de vos comptes bancaires ouverts dans la galaxie (numéros et établissements)</label>
+          <textarea class="form-control form-control-sm" rows="2" required placeholder="Un compte par ligne..."></textarea>
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">4.5 — Possédez-vous des cristaux Kyber non déclarés ?</label>
+          <div class="form-check form-check-inline">
+            <%# PIÈGE 6 : Cristaux Kyber non déclarés %>
+            <input class="form-check-input" type="radio" name="kyber" value="oui"
+                   data-action="change->subsidy-form#trapKyber">
+            <label class="form-check-label text-success" style="font-size: 0.75rem;">Oui</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="kyber" value="non">
+            <label class="form-check-label text-success" style="font-size: 0.75rem;">Non</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <%# ═══════════════════════════════════════════ %>
+      <%# SECTION 5 : Serment et Validation %>
+      <%# ═══════════════════════════════════════════ %>
+      <fieldset class="border border-secondary rounded p-2 mb-2">
+        <legend class="text-info" style="font-size: 0.8rem;">Section 5 — Serment Galactique et Validation Finale</legend>
+
+        <p class="text-secondary" style="font-size: 0.65rem;">
+          En cochant la case ci-dessous, je déclare sur l'honneur que les informations fournies dans le présent
+          formulaire GR-7742-B/rev.38 sont exactes et complètes. Je reconnais que toute fausse déclaration
+          m'expose aux sanctions prévues par l'Article 447-B du Code Pénal Galactique, incluant mais ne se
+          limitant pas à : amende de 50 000 crédits, travaux forcés dans les mines de Kessel, ou exil sur Tatooine.
+          Je reconnais également que la République Galactique se réserve le droit de modifier le montant
+          de la subvention allouée sans préavis ni recours possible, conformément à la Directive 7742-C
+          du Bureau des Allocations Budgétaires.
+        </p>
+
+        <%# PIÈGE 7 : Ne PAS cocher "Je refuse" %>
+        <div class="form-check mb-1">
+          <input class="form-check-input" type="checkbox" id="refus_serment"
+                 data-action="change->subsidy-form#trapRefus">
+          <label class="form-check-label text-success" style="font-size: 0.7rem;" for="refus_serment">
+            Je refuse les conditions énoncées ci-dessus
+          </label>
+        </div>
+
+        <div class="form-check mb-1">
+          <input class="form-check-input" type="checkbox" id="galactic_oath" name="galactic_oath" value="1" required>
+          <label class="form-check-label text-success" style="font-size: 0.7rem;" for="galactic_oath">
+            Je prête le Serment Galactique et certifie l'exactitude de ce formulaire
+          </label>
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">5.1 — Retapez votre Numéro d'Identification Galactique pour confirmation</label>
+          <input type="text" class="form-control form-control-sm" maxlength="16" minlength="16" pattern="[A-Za-z0-9]{16}" required title="Le NIG doit contenir exactement 16 caractères alphanumériques" />
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">5.2 — Date du jour (en calendrier standard galactique, format : cycle.rotation.ère)</label>
+          <input type="text" class="form-control form-control-sm" required placeholder="Ex: 234.12.3ABY" />
+        </div>
+      </fieldset>
+
+      <%# ═══════════════════════════════════════════ %>
+      <%# SECTION BONUS : Question piège finale %>
+      <%# ═══════════════════════════════════════════ %>
+      <fieldset class="border border-warning rounded p-2 mb-2">
+        <legend class="text-warning" style="font-size: 0.8rem;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Section 6 — Vérification Anti-Fraude (obligatoire)
+        </legend>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">6.1 — Complétez la phrase : « La République est... »</label>
+          <select class="form-control form-control-sm" required
+                  data-action="change->subsidy-form#trapRepublique"
+                  data-subsidy-form-target="republiqueSelect">
+            <option value="">— Sélectionnez —</option>
+            <option value="corrompue">...corrompue et inefficace</option>
+            <option value="parfaite">...un modèle parfait de démocratie galactique</option>
+            <option value="acceptable">...une institution acceptable malgré ses défauts</option>
+            <option value="vive">...la plus grande institution de la galaxie. Vive la République !</option>
+          </select>
+        </div>
+
+        <div class="form-group mb-1">
+          <label class="text-success" style="font-size: 0.75rem;">6.2 — Évaluez votre satisfaction envers le Chancelier Suprême</label>
+          <div>
+            <% ["Insatisfaisant", "Passable", "Satisfaisant", "Très satisfaisant", "Extatique"].each_with_index do |label, i| %>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="satisfaction_chancelier" value="<%= i %>"
+                       data-action="change->subsidy-form#trapChancelier" required>
+                <label class="form-check-label text-success" style="font-size: 0.65rem;"><%= label %></label>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="text-center mt-2 mb-3">
+        <button type="submit" class="btn btn-outline-success btn-sm" data-subsidy-form-target="submitBtn">
+          <i class="fa-solid fa-paper-plane"></i> Soumettre le formulaire GR-7742-B
+        </button>
+      </div>
+
+    <% end %>
+
+    <div class="text-center mb-3">
+      <%= link_to "Abandonner la procédure", new_transaction_path, class: "btn btn-outline-secondary btn-sm" %>
+    </div>
+  </div>
+</div>

@@ -45,8 +45,11 @@
         <% if current_user.group.name == "PJ" %>
           <!-- Les PJ ne peuvent envoyer qu'à leurs contacts -->
           <label>Envoyer à :</label>
-          <%= select_tag 'target_user', 
-              options_from_collection_for_select(current_user.get_contacts, 'id', 'username', @holonew.target_user), 
+          <%= select_tag 'target_user',
+              grouped_options_for_select([
+                ["Contacts", current_user.get_contacts.map { |u| [u.username, u.id] }],
+                ["Services", User.pnj_contacts.where.not(id: current_user.id).map { |u| [u.username, u.id] }]
+              ], @holonew.target_user),
               { prompt: "Sélectionner un contact", class: "form-control" } %>
           <small class="text-muted">Vous ne pouvez envoyer qu'à vos contacts. Ajoutez-en en cliquant sur "Mes Contacts".</small>
           <!-- Bouton Contacts pour les PJ -->
