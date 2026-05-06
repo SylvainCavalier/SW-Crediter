@@ -3,6 +3,8 @@ import "controllers";
 import "@popperjs/core";
 import "bootstrap";
 import * as ActionCable from "@rails/actioncable";
+import * as ActiveStorage from "@rails/activestorage";
+ActiveStorage.start();
 
 console.log("✅ Application JS chargée.");
 

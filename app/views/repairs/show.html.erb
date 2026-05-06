@@ -6,9 +6,6 @@
     <%= current_user.username.titleize %>
   </p>
 
-  <!-- Cadre principal SVG -->
-  <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
-
   <!-- Contenu principal de reparation -->
   <div class="repair-page-container" data-repair-target="mainContent">
     <h2 class="repair-title"><i class="fa-solid fa-screwdriver-wrench"></i> Reparation</h2>
@@ -24,7 +21,7 @@
       <div class="repair-already-done">
         <i class="fa-solid fa-circle-check"></i>
         <p>Cet equipement a deja ete repare par vos soins.</p>
-        <%= link_to root_path, class: "btn btn-outline-success mt-2" do %>
+        <%= link_to repairs_scan_path, class: "btn btn-outline-success mt-2" do %>
           <i class="fa-solid fa-arrow-left"></i> Retour
         <% end %>
       </div>
@@ -61,7 +58,7 @@
 
       <div class="mt-2">
         <%= link_to repairs_scan_path, class: "btn btn-sm btn-outline-success" do %>
-          <i class="fa-solid fa-qrcode"></i> Scanner un autre QR
+          <i class="fa-solid fa-arrow-left"></i> Retour
         <% end %>
       </div>
     <% end %>

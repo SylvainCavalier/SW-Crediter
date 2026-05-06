@@ -35,7 +35,12 @@ Rails.application.routes.draw do
   resources :subscriptions, only: [:create, :destroy]
 
   # Holonews (messagerie)
-  resources :holonews, only: [:index, :new, :create]
+  get 'holonews/drafts', to: 'holonews#drafts', as: :holonews_drafts
+  resources :holonews, only: [:index, :new, :create] do
+    member do
+      post :send_draft
+    end
+  end
   get 'holonews/count', to: 'holonews#count'
 
   # Contacts (pour holonews)
@@ -50,6 +55,13 @@ Rails.application.routes.draw do
   get 'repairs/scan', to: 'repairs#scan', as: :repairs_scan
   get 'repairs/:qr_token', to: 'repairs#show', as: :repair
   post 'repairs/:qr_token/validate', to: 'repairs#validate_code', as: :repair_validate
+
+  # Vision de la Force (scan QR + lecture video)
+  get 'force_visions/scan', to: 'force_visions#scan', as: :force_visions_scan
+  get 'force_visions', to: 'force_visions#index', as: :force_visions
+  post 'force_visions', to: 'force_visions#create'
+  delete 'force_visions/:id', to: 'force_visions#destroy', as: :force_vision_admin
+  get 'force_visions/:qr_token', to: 'force_visions#show', as: :force_vision
 
   # Pazaak (jeu de cartes)
   namespace :pazaak do

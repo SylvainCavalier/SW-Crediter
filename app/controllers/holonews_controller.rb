@@ -3,10 +3,10 @@ class HolonewsController < ApplicationController
 
   def index
     if current_user.mj?
-      @holonews = Holonew.includes(:sender).order(created_at: :desc).page(params[:page]).per(10)
+      @holonews = Holonew.published.includes(:sender).order(created_at: :desc).page(params[:page]).per(10)
     else
       npc_ids = current_user.npc_characters.pluck(:id).presence || [-1]
-      @holonews = Holonew.includes(:sender)
+      @holonews = Holonew.published.includes(:sender)
                           .where("target_user = :uid OR target_npc_character_id IN (:npc_ids) OR target_group IN (:groups)",
                                  uid: current_user.id,
                                  npc_ids: npc_ids,
@@ -45,6 +45,8 @@ class HolonewsController < ApplicationController
   def create
     @holonew = Holonew.new(holonew_params)
     @holonew.sender = current_user
+    save_as_draft = current_user.pnj? && params[:save_as_draft].present?
+    @holonew.draft = save_as_draft
 
     target = parse_target(params[:recipient])
 
@@ -77,8 +79,10 @@ class HolonewsController < ApplicationController
     end
 
     if @holonew.save
+      notice = save_as_draft ? "Brouillon enregistré" : "Holonew envoyée"
+      redirect_path = save_as_draft ? holonews_drafts_path : new_holonew_path
       respond_to do |format|
-        format.html { redirect_to new_holonew_path, notice: "Holonew envoyée" }
+        format.html { redirect_to redirect_path, notice: notice }
       end
     else
       @recipient_options = build_recipient_options
@@ -87,6 +91,22 @@ class HolonewsController < ApplicationController
         format.html { render :new, status: :unprocessable_entity }
       end
     end
+  end
+
+  def drafts
+    return redirect_to holonews_path, alert: "Accès réservé aux PNJ." unless current_user.pnj? || current_user.mj?
+
+    @drafts = Holonew.drafts.includes(:sender).order(created_at: :desc)
+  end
+
+  def send_draft
+    return redirect_to holonews_path, alert: "Accès réservé aux PNJ." unless current_user.pnj? || current_user.mj?
+
+    @holonew = Holonew.drafts.find(params[:id])
+    @holonew.update(draft: false, created_at: Time.current)
+    @holonew.update_holonews_counter
+
+    redirect_to holonews_drafts_path, notice: "Holonew envoyée"
   end
 
   private

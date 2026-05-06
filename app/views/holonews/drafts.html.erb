@@ -1,0 +1,65 @@
+<div class="frame-container" style="position: relative; width: 100%; height: 100vh;">
+  <p class="username-display mt-1 text-primary fw-bold">
+    <%= current_user.username.titleize %>
+  </p>
+  <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
+  <div class="holonews-container">
+    <h2 class="text-center text-warning mb-3">Brouillons</h2>
+    <div class="holonews-list-container mx-2" data-controller="toggle-content">
+      <% if @drafts.empty? %>
+        <p class="text-center text-muted">Aucun brouillon en attente.</p>
+      <% end %>
+      <% @drafts.each do |draft| %>
+        <div class="holonew-item p-1 mb-1 bg-light rounded">
+          <h3><%= draft.title %></h3>
+          <% sender_label = if draft.sender_alias.present?
+                              draft.sender_alias
+                            elsif draft.sender_npc_character.present?
+                              draft.sender_npc_character.name
+                            else
+                              draft.sender.display_name_for(current_user)
+                            end %>
+          <% recipient_label = if draft.target_npc_character.present?
+                                 draft.target_npc_character.name
+                               elsif draft.target_user.present?
+                                 User.find_by(id: draft.target_user)&.username || "?"
+                               elsif draft.target_group == "all"
+                                 "Tous"
+                               elsif draft.target_group.present?
+                                 "Groupe #{draft.target_group}"
+                               else
+                                 "(aucun destinataire)"
+                               end %>
+          <p>
+            <strong>Expéditeur :</strong> <%= sender_label %><br>
+            <strong>Destinataire :</strong> <%= recipient_label %><br>
+            <small class="text-muted text-success">
+              Préparé le <%= l(draft.created_at, format: "%d/%m/%Y à %H:%M") %>
+            </small>
+          </p>
+
+          <% if draft.content.length > 100 %>
+            <p class="text-truncate" data-toggle-content-target="content">
+              <%= draft.content %>
+            </p>
+            <button class="btn btn-link p-0" data-action="click->toggle-content#toggle">
+              Voir plus
+            </button>
+          <% else %>
+            <p><%= draft.content %></p>
+          <% end %>
+
+          <% if draft.image.attached? %>
+            <div class="holonew-image mt-2">
+              <%= image_tag draft.image, class: "img-fluid rounded" %>
+            </div>
+          <% end %>
+
+          <%= button_to "Envoyer", send_draft_holonew_path(draft), method: :post, class: "btn btn-sm btn-outline-success", data: { turbo_confirm: "Envoyer ce brouillon maintenant ?" } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= link_to "Retour", holonews_path, class: "btn btn-outline-success go-back" %>
+</div>

@@ -1,11 +1,10 @@
 <div class="frame-container" style="position: relative; width: 100%; height: 100vh;">
-  <!-- Username -->
   <p class="username-display mt-1 text-primary fw-bold">
     <%= current_user.username.titleize %>
   </p>
 
-  <div class="repair-scan-container" data-controller="repair-scanner">
-    <h2 class="repair-title"><i class="fa-solid fa-wrench"></i> Reparations</h2>
+  <div class="repair-scan-container" data-controller="force-vision-scanner">
+    <h2 class="repair-title"><i class="fa-solid fa-eye"></i> Vision de la Force</h2>
 
     <div class="scan-instructions mt-3">
       <div class="text-center mb-3">
@@ -13,38 +12,45 @@
       </div>
 
       <button type="button" class="btn btn-sm btn-outline-success d-block mx-auto"
-              data-repair-scanner-target="scanButton"
-              data-action="click->repair-scanner#startScan">
+              data-force-vision-scanner-target="scanButton"
+              data-action="click->force-vision-scanner#startScan">
         <i class="fa-solid fa-camera"></i> Scanner avec la camera
       </button>
 
       <video class="d-none mt-3 w-100" style="max-width: 280px; margin: 0 auto; display: block; border-radius: 8px;"
              playsinline autoplay muted
-             data-repair-scanner-target="video"></video>
+             data-force-vision-scanner-target="video"></video>
       <p class="text-light text-center mt-2" style="font-size: 0.8rem;"
-         data-repair-scanner-target="status"></p>
+         data-force-vision-scanner-target="status"></p>
 
       <p class="text-light text-center d-none mt-2" style="font-size: 0.85rem;"
-         data-repair-scanner-target="nativeHint">
+         data-force-vision-scanner-target="nativeHint">
         Scanner non supporte sur ce navigateur. Scannez le QR Code avec <strong>l'appareil photo</strong> de votre telephone : le lien s'ouvrira automatiquement.
       </p>
     </div>
 
     <hr class="border-success opacity-50">
 
-    <!-- Saisie manuelle du token -->
     <div class="manual-entry mt-3">
       <p class="text-muted text-center" style="font-size: 0.8rem;">
         <i class="fa-solid fa-keyboard"></i> Ou entrez le code manuellement :
       </p>
       <div class="d-flex gap-2 justify-content-center">
         <input type="text" class="form-control form-control-sm" style="max-width: 200px;"
-               placeholder="Code QR" data-repair-scanner-target="manualInput">
-        <button class="btn btn-sm btn-outline-success" data-action="click->repair-scanner#manualSubmit">
+               placeholder="Code QR" data-force-vision-scanner-target="manualInput">
+        <button class="btn btn-sm btn-outline-success" data-action="click->force-vision-scanner#manualSubmit">
           <i class="fa-solid fa-arrow-right"></i>
         </button>
       </div>
     </div>
+
+    <% if current_user.can_manage_force_vision? %>
+      <div class="mt-3 text-center">
+        <%= link_to force_visions_path, class: "btn btn-sm btn-outline-success" do %>
+          <i class="fa-solid fa-cog"></i> Gerer les visions
+        <% end %>
+      </div>
+    <% end %>
 
     <div class="mt-3">
       <%= link_to root_path, class: "btn btn-sm btn-outline-success" do %>

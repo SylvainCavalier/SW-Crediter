@@ -71,6 +71,9 @@
       <div class="form-group mt-4">
         <%= link_to "Annuler", holonews_path, class: "btn btn-outline-success" %>
         <%= f.submit "Envoyer", class: "btn btn-outline-success" %>
+        <% if current_user.pnj? %>
+          <%= f.submit "Ajouter aux brouillons", name: "save_as_draft", class: "btn btn-outline-warning" %>
+        <% end %>
       </div>
     <% end %>
   </div>

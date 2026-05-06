@@ -21,7 +21,7 @@ class User < ApplicationRecord
            class_name: "UserContact",
            as: :contactable,
            dependent: :destroy
-  has_one_attached :avatar
+  has_one_attached :avatar, service: :cloudinary
 
   validates :username, presence: true, uniqueness: true
 
@@ -114,6 +114,17 @@ class User < ApplicationRecord
     return true if pnj? && %w[sylvain noe].include?(username.to_s.downcase)
 
     false
+  end
+
+  def can_access_force_vision?
+    return true if ["Maître Jedi", "Padawan"].include?(character_class)
+    return true if can_manage_force_vision?
+
+    false
+  end
+
+  def can_manage_force_vision?
+    pnj? && %w[sylvain pia].include?(username.to_s.downcase)
   end
 
   def self.pnj_contacts

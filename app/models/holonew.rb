@@ -12,8 +12,10 @@ class Holonew < ApplicationRecord
   validate :image_size_validation
 
   scope :unread, -> { where(read: false) }
+  scope :drafts, -> { where(draft: true) }
+  scope :published, -> { where(draft: false) }
 
-  after_create_commit :update_holonews_counter
+  after_create_commit :update_holonews_counter, unless: :draft?
 
   def update_holonews_counter
     users = if target_npc_character_id.present?

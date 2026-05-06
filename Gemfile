@@ -83,3 +83,4 @@ group :test do
 end
 
 gem "webpush", "~> 1.1"
+gem "aws-sdk-s3", require: false

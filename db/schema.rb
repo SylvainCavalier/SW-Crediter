@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_06_133526) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_06_173040) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,6 +42,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_06_133526) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "force_visions", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "qr_token", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["qr_token"], name: "index_force_visions_on_qr_token", unique: true
+  end
+
   create_table "groups", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -71,6 +79,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_06_133526) do
     t.string "sender_alias"
     t.bigint "target_npc_character_id"
     t.bigint "sender_npc_character_id"
+    t.boolean "draft", default: false, null: false
+    t.index ["draft"], name: "index_holonews_on_draft"
     t.index ["sender_npc_character_id"], name: "index_holonews_on_sender_npc_character_id"
     t.index ["target_npc_character_id"], name: "index_holonews_on_target_npc_character_id"
     t.index ["user_id"], name: "index_holonews_on_user_id"

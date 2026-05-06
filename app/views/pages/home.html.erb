@@ -70,13 +70,20 @@
 
   <!-- Boutons de bas de page -->
   <div class="home-bottom-buttons">
-    <% if current_user.can_access_repairs? %>
-      <%= link_to repairs_scan_path, class: "repair-scan-btn" do %>
-        <i class="fa-solid fa-wrench"></i>
+    <% if current_user.can_access_force_vision? %>
+      <%= link_to force_visions_scan_path do %>
+        <img src="<%= asset_path('triangle.svg') %>" alt="Vision de la Force" class="ui-function">
       <% end %>
+    <% else %>
+      <img src="<%= asset_path('triangle.svg') %>" alt="Function UI" class="ui-function">
     <% end %>
-    <img src="<%= asset_path('triangle.svg') %>" alt="Function UI" class="ui-function">
-    <img src="<%= asset_path('target.svg') %>" alt="Function UI" class="ui-function">
+    <% if current_user.can_access_repairs? %>
+      <%= link_to repairs_scan_path do %>
+        <img src="<%= asset_path('target.svg') %>" alt="Reparations" class="ui-function">
+      <% end %>
+    <% else %>
+      <img src="<%= asset_path('target.svg') %>" alt="Function UI" class="ui-function">
+    <% end %>
   </div>
 
   <!-- CENTRAL CONTAINER -->
