@@ -16,12 +16,15 @@ end
 puts "Renaming MJ Sylvain if needed..."
 existing_mj = User.find_by("LOWER(username) = ?", "sylvain")
 if existing_mj && existing_mj.group_id == group_mj.id
-  existing_mj.update!(username: "MJ Sylvain")
+  existing_mj.update!(username: "MJ Sylvain", email: "mj@sw-gn.com")
   puts "Renamed MJ account 'Sylvain' to 'MJ Sylvain'"
 end
 
 puts "Creating MJ account..."
-unless User.find_by("LOWER(username) = ?", "mj sylvain")
+mj_sylvain = User.find_by("LOWER(username) = ?", "mj sylvain")
+if mj_sylvain
+  mj_sylvain.update!(email: "mj@sw-gn.com") unless mj_sylvain.email == "mj@sw-gn.com"
+else
   User.create!(
     username: "MJ Sylvain",
     email: "mj@sw-gn.com",
