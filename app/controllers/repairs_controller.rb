@@ -1,6 +1,6 @@
 class RepairsController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_technicien
+  before_action :require_repair_access
 
   def scan
     # Page avec le scanner QR
@@ -48,9 +48,10 @@ class RepairsController < ApplicationController
 
   private
 
-  def require_technicien
-    unless current_user.username.downcase == "agent b-47"
-      redirect_to root_path, alert: "Seuls les Techniciens peuvent acceder aux reparations."
-    end
+  def require_repair_access
+    return if %w[Technicienne Prospecteur].include?(current_user.character_class)
+    return if current_user.pnj? && %w[sylvain noe].include?(current_user.username.downcase)
+
+    redirect_to root_path, alert: "Vous n'avez pas accès aux réparations."
   end
 end
