@@ -53,8 +53,7 @@ class RepairsController < ApplicationController
   private
 
   def require_repair_access
-    return if %w[Technicienne Prospecteur].include?(current_user.character_class)
-    return if current_user.pnj? && %w[sylvain noe].include?(current_user.username.downcase)
+    return if current_user.can_access_repairs?
 
     redirect_to root_path, alert: "Vous n'avez pas accès aux réparations."
   end

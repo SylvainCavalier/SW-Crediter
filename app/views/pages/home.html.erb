@@ -70,7 +70,7 @@
 
   <!-- Boutons de bas de page -->
   <div class="home-bottom-buttons">
-    <% if current_user.username.downcase == "agent b-47" %>
+    <% if current_user.can_access_repairs? %>
       <%= link_to repairs_scan_path, class: "repair-scan-btn" do %>
         <i class="fa-solid fa-wrench"></i>
       <% end %>

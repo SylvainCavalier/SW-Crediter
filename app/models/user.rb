@@ -109,6 +109,13 @@ class User < ApplicationRecord
     pnj?
   end
 
+  def can_access_repairs?
+    return true if %w[Technicienne Prospecteur].include?(character_class)
+    return true if pnj? && %w[sylvain noe].include?(username.to_s.downcase)
+
+    false
+  end
+
   def self.pnj_contacts
     joins(:group).where(groups: { name: "PNJ" })
   end
