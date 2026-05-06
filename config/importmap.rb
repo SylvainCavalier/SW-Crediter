@@ -10,3 +10,4 @@ pin "@popperjs/core", to: "popper.js", preload: true
 pin "@rails/actioncable", to: "actioncable.esm.js"
 pin "plyr" # @3.8.4
 pin "@rails/activestorage", to: "@rails--activestorage.js" # @8.1.300
+pin "jsqr" # @1.4.0

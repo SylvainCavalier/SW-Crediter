@@ -1,11 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
+import jsQR from "jsqr"
 
 export default class extends Controller {
   static targets = ["manualInput", "scanButton", "video", "status", "nativeHint"]
 
   connect() {
     this.scanning = false
-    if (!("BarcodeDetector" in window)) {
+    this.useNativeDetector = "BarcodeDetector" in window
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       if (this.hasScanButtonTarget) this.scanButtonTarget.classList.add("d-none")
       if (this.hasNativeHintTarget) this.nativeHintTarget.classList.remove("d-none")
     }
@@ -16,8 +18,6 @@ export default class extends Controller {
   }
 
   async startScan() {
-    if (!("BarcodeDetector" in window)) return
-
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       this.statusTarget.textContent = "API camera non disponible sur ce navigateur."
       return
@@ -38,7 +38,12 @@ export default class extends Controller {
       this.scanButtonTarget.classList.add("d-none")
       this.statusTarget.textContent = "Scan en cours..."
       this.scanning = true
-      this.detector = new BarcodeDetector({ formats: ["qr_code"] })
+      if (this.useNativeDetector) {
+        this.detector = new BarcodeDetector({ formats: ["qr_code"] })
+      } else {
+        this.canvas = document.createElement("canvas")
+        this.canvasContext = this.canvas.getContext("2d", { willReadFrequently: true })
+      }
       this.scanLoop()
     } catch (error) {
       console.error("Camera error:", error)
@@ -92,15 +97,31 @@ export default class extends Controller {
   async scanLoop() {
     if (!this.scanning) return
     try {
-      const barcodes = await this.detector.detect(this.videoTarget)
-      if (barcodes.length > 0) {
-        this.handleScan(barcodes[0].rawValue)
+      const code = this.useNativeDetector ? await this.detectNative() : this.detectFallback()
+      if (code) {
+        this.handleScan(code)
         return
       }
     } catch (e) {
       // ignore transient detection errors
     }
     requestAnimationFrame(() => this.scanLoop())
+  }
+
+  async detectNative() {
+    const barcodes = await this.detector.detect(this.videoTarget)
+    return barcodes.length > 0 ? barcodes[0].rawValue : null
+  }
+
+  detectFallback() {
+    const video = this.videoTarget
+    if (video.readyState !== video.HAVE_ENOUGH_DATA) return null
+    this.canvas.width = video.videoWidth
+    this.canvas.height = video.videoHeight
+    this.canvasContext.drawImage(video, 0, 0, this.canvas.width, this.canvas.height)
+    const imageData = this.canvasContext.getImageData(0, 0, this.canvas.width, this.canvas.height)
+    const result = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" })
+    return result ? result.data : null
   }
 
   handleScan(rawValue) {
