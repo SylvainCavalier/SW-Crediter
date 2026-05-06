@@ -2,12 +2,15 @@ class HolonewsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    if current_user.mj? || current_user.pnj?
+    if current_user.mj?
       @holonews = Holonew.includes(:sender).order(created_at: :desc).page(params[:page]).per(10)
     else
+      npc_ids = current_user.npc_characters.pluck(:id).presence || [-1]
       @holonews = Holonew.includes(:sender)
-                          .where("target_group = ? OR target_user = ? OR target_group = ?",
-                                 current_user.group.name.to_s, current_user.id, 'all')
+                          .where("target_user = :uid OR target_npc_character_id IN (:npc_ids) OR target_group IN (:groups)",
+                                 uid: current_user.id,
+                                 npc_ids: npc_ids,
+                                 groups: [current_user.group.name.to_s, 'all'])
                           .order(created_at: :desc)
                           .page(params[:page]).per(10)
     end

@@ -769,9 +769,9 @@ input[type="submit"] {
 
 .transaction-bottom-buttons {
   position: absolute;
-  top: 80%;
+  bottom: 4%;
   left: 50%;
-  transform: translateY(-50%);
+  transform: translateX(-50%);
   z-index: 5;
 }
 

@@ -70,6 +70,8 @@
 
   <div class="transaction-bottom-buttons d-flex gap-2">
     <%= link_to "Retour", root_path, class: "btn btn-outline-secondary" %>
-    <%= link_to "Subventions de la République", new_subsidy_path, class: "btn btn-outline-warning btn-sm" %>
+    <% if ["Sénateur", "Analyste", "Amiral", "Maître Jedi", "Padawan"].include?(current_user.character_class) %>
+      <%= link_to "Subventions de la République", new_subsidy_path, class: "btn btn-outline-warning btn-sm" %>
+    <% end %>
   </div>
 </div>
