@@ -18,10 +18,20 @@ export default class extends Controller {
   async startScan() {
     if (!("BarcodeDetector" in window)) return
 
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      this.statusTarget.textContent = "API camera non disponible sur ce navigateur."
+      return
+    }
+
+    if (await this.cameraPermissionDenied()) {
+      this.showPermissionDeniedHelp()
+      return
+    }
+
+    this.statusTarget.textContent = "Autorisez l'acces a la camera dans la fenetre du navigateur..."
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" }
-      })
+      const stream = await this.requestCameraStream()
       this.stream = stream
       this.videoTarget.srcObject = stream
       this.videoTarget.classList.remove("d-none")
@@ -32,7 +42,40 @@ export default class extends Controller {
       this.scanLoop()
     } catch (error) {
       console.error("Camera error:", error)
-      this.statusTarget.textContent = "Camera indisponible. Utilisez la saisie manuelle."
+      if (error && error.name === "NotAllowedError") {
+        this.showPermissionDeniedHelp()
+        return
+      }
+      const reason = error && error.name ? `${error.name}: ${error.message || ""}` : "erreur inconnue"
+      this.statusTarget.textContent = `Camera indisponible (${reason}). Utilisez la saisie manuelle.`
+    }
+  }
+
+  async cameraPermissionDenied() {
+    if (!navigator.permissions || !navigator.permissions.query) return false
+    try {
+      const result = await navigator.permissions.query({ name: "camera" })
+      return result.state === "denied"
+    } catch (e) {
+      return false
+    }
+  }
+
+  showPermissionDeniedHelp() {
+    this.statusTarget.innerHTML =
+      "Acces a la camera bloque. Pour reactiver : touchez l'icone <strong>cadenas</strong> (ou les <strong>trois points</strong>) a cote de l'URL en haut de la page, puis Autorisations &gt; Camera &gt; Autoriser, puis rechargez la page."
+  }
+
+  async requestCameraStream() {
+    try {
+      return await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" } }
+      })
+    } catch (error) {
+      if (error.name === "OverconstrainedError" || error.name === "NotFoundError") {
+        return await navigator.mediaDevices.getUserMedia({ video: true })
+      }
+      throw error
     }
   }
 
