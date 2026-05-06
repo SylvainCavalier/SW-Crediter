@@ -7,16 +7,29 @@
   <!-- Cadre principal SVG -->
   <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
 
-  <div class="repair-scan-container">
+  <div class="repair-scan-container" data-controller="repair-scanner">
     <h2 class="repair-title"><i class="fa-solid fa-wrench"></i> Reparations</h2>
 
     <div class="scan-instructions mt-3">
       <div class="text-center mb-3">
         <i class="fa-solid fa-qrcode" style="font-size: 3rem; color: #1EDD88;"></i>
       </div>
-      <p class="text-light text-center" style="font-size: 0.9rem;">
-        Scannez le QR Code de l'equipement avec <strong>l'appareil photo</strong> de votre telephone.
-        Le lien s'ouvrira automatiquement dans l'application.
+
+      <button type="button" class="btn btn-sm btn-outline-success d-block mx-auto"
+              data-repair-scanner-target="scanButton"
+              data-action="click->repair-scanner#startScan">
+        <i class="fa-solid fa-camera"></i> Scanner avec la camera
+      </button>
+
+      <video class="d-none mt-3 w-100" style="max-width: 280px; margin: 0 auto; display: block; border-radius: 8px;"
+             playsinline autoplay muted
+             data-repair-scanner-target="video"></video>
+      <p class="text-light text-center mt-2" style="font-size: 0.8rem;"
+         data-repair-scanner-target="status"></p>
+
+      <p class="text-light text-center d-none mt-2" style="font-size: 0.85rem;"
+         data-repair-scanner-target="nativeHint">
+        Scanner non supporte sur ce navigateur. Scannez le QR Code avec <strong>l'appareil photo</strong> de votre telephone : le lien s'ouvrira automatiquement.
       </p>
     </div>
 
@@ -29,8 +42,7 @@
       </p>
       <div class="d-flex gap-2 justify-content-center">
         <input type="text" class="form-control form-control-sm" style="max-width: 200px;"
-               placeholder="Code QR" data-repair-scanner-target="manualInput"
-               data-controller="repair-scanner">
+               placeholder="Code QR" data-repair-scanner-target="manualInput">
         <button class="btn btn-sm btn-outline-success" data-action="click->repair-scanner#manualSubmit">
           <i class="fa-solid fa-arrow-right"></i>
         </button>

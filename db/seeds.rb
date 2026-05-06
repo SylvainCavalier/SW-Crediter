@@ -323,7 +323,7 @@ Repair.find_or_create_by!(qr_token: "2e3641baadd26652") do |r|
   r.name = "Vaisseau"
   r.description = "Réparation du vaisseau"
   r.required_parts = ["Microprocesseur", "Valve d'électrocablage", "Rotobrosseur", "Commutateur ionique", "Rétropropulseur"]
-  r.code = "146322317"
+  r.code = "14632231796"
 end
 
 Repair.find_or_create_by!(qr_token: "b640510b9d12c8d9") do |r|
@@ -351,7 +351,7 @@ Repair.find_or_create_by!(qr_token: "fffa6e1037b13293") do |r|
   r.name = "Antenne de communication"
   r.description = "L'antenne de communication est defaillante. Plusieurs composants doivent etre remplaces pour restaurer les transmissions."
   r.required_parts = ["Communicateur ionique", "Carte mere avec programme de transmission", "Electro-rivet"]
-  r.code = "3811612"
+  r.code = "3171612"
 end
 
 Repair.find_or_create_by!(qr_token: "2483577ff211e7d9") do |r|
@@ -366,6 +366,13 @@ Repair.find_or_create_by!(qr_token: "85556390454417a8") do |r|
   r.description = "Le four entrique est en panne. La magneto-charniere doit etre remplacee."
   r.required_parts = ["Magneto-charniere"]
   r.code = "637"
+end
+
+Repair.find_or_create_by!(qr_token: "0885ab4082c808bd") do |r|
+  r.name = "Bouclier du hangar"
+  r.description = "Le bouclier du hangar est hors service. Le commutateur ionique doit etre remplace pour le reactiver."
+  r.required_parts = ["Commutateur ionique"]
+  r.code = "217"
 end
 
 puts "Seed terminé !"
