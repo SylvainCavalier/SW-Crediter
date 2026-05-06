@@ -3,15 +3,16 @@
   <p class="username-display mt-1 text-primary fw-bold">
     <%= current_user.username %>
   </p>
-  
+
   <!-- Cadre principal SVG -->
   <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
   <!-- Formulaire -->
   <div class="custom-form">
     <%= simple_form_for @holonew, local: true do |f| %>
-      <% if @reply_to_username.present? %>
+      <% if @reply_target.present? %>
         <div class="alert alert-info">
-          Réponse à <%= @reply_to_username %>
+          Réponse à
+          <%= @reply_target.is_a?(NpcCharacter) ? @reply_target.name : @reply_target.username %>
         </div>
       <% end %>
 
@@ -19,16 +20,21 @@
         <%= f.input :title, label: "Titre", input_html: { class: 'form-control' } %>
       </div>
 
-      <% if current_user.group.name == "PNJ" %>
+      <% if current_user.pnj? %>
+        <% if @sender_npc_options&.any? %>
+          <div class="form-group">
+            <label>Envoyer en tant que</label>
+            <%= select_tag 'sender_npc_character_id',
+                options_from_collection_for_select(@sender_npc_options, 'id', 'name'),
+                prompt: "Mon prénom réel (#{current_user.real_first_name || current_user.username})",
+                class: 'form-control' %>
+          </div>
+        <% end %>
         <div class="form-group">
-          <%= f.input :sender_alias, 
-              label: "Nom de l'expéditeur (optionnel)", 
+          <%= f.input :sender_alias,
+              label: "Alias d'expéditeur (optionnel)",
               placeholder: "Laissez vide pour utiliser votre nom",
               input_html: { class: 'form-control' } %>
-        </div>
-        <div class="form-group">
-          <%= check_box_tag 'send_to_all', '1', false, class: 'form-check-input' %>
-          <label class="form-check-label">Envoyer à tous</label>
         </div>
       <% end %>
 
@@ -42,29 +48,23 @@
 
       <!-- Sélection du destinataire -->
       <div class="form-group">
-        <% if current_user.group.name == "PJ" %>
-          <!-- Les PJ ne peuvent envoyer qu'à leurs contacts -->
+        <% if current_user.pj? %>
           <label>Envoyer à :</label>
-          <%= select_tag 'target_user',
-              grouped_options_for_select([
-                ["Contacts", current_user.get_contacts.map { |u| [u.username, u.id] }],
-                ["Services", User.pnj_contacts.where.not(id: current_user.id).map { |u| [u.username, u.id] }]
-              ], @holonew.target_user),
+          <%= select_tag 'recipient',
+              grouped_options_for_select(@recipient_options),
               { prompt: "Sélectionner un contact", class: "form-control" } %>
-          <small class="text-muted">Vous ne pouvez envoyer qu'à vos contacts. Ajoutez-en en cliquant sur "Mes Contacts".</small>
-          <!-- Bouton Contacts pour les PJ -->
+          <small class="text-muted">Vous ne pouvez envoyer qu'à vos contacts ou aux services. Ajoutez-en en cliquant sur "Mes Contacts".</small>
           <div class="mb-2">
             <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#contactsModal">
               📇 Mes Contacts
             </button>
           </div>
         <% else %>
-          <!-- Les MJ et PNJ peuvent envoyer à n'importe quel utilisateur -->
-          <label>Envoyer à des utilisateurs :</label>
-          <%= select_tag 'target_user', 
-              options_from_collection_for_select(@users, 'id', 'username', @holonew.target_user), 
-              prompt: "Sélectionner un utilisateur", 
-              class: "form-control" %>
+          <label>Envoyer à :</label>
+          <%= select_tag 'recipient',
+              grouped_options_for_select(@recipient_options) +
+                "<optgroup label='Diffusion'><option value='all'>Tous</option></optgroup>".html_safe,
+              { prompt: "Sélectionner un destinataire", class: "form-control" } %>
         <% end %>
       </div>
 
@@ -77,7 +77,7 @@
 </div>
 
 <!-- Modale Contacts -->
-<% if current_user.group.name == "PJ" %>
+<% if current_user.pj? %>
   <div class="modal fade" id="contactsModal" tabindex="-1" aria-labelledby="contactsModalLabel" aria-hidden="true" data-controller="contacts">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -89,7 +89,7 @@
           <!-- Formulaire pour ajouter un contact -->
           <div class="mb-3">
             <%= form_with url: add_contacts_path, method: :post, local: true, id: "add-contact-form", class: "d-flex gap-2" do |f| %>
-              <%= f.text_field :contact_username, placeholder: "Nom d'utilisateur exact", class: "form-control", required: true %>
+              <%= f.text_field :contact_username, placeholder: "Nom d'utilisateur ou personnage", class: "form-control", required: true %>
               <%= f.submit "Ajouter", class: "btn btn-sm btn-outline-success" %>
             <% end %>
             <div id="contact-error" class="mt-2"></div>
@@ -97,7 +97,7 @@
 
           <!-- Liste des contacts -->
           <div id="contacts-list">
-            <%= render "contacts/list", contacts: current_user.get_contacts %>
+            <%= render "contacts/list", contacts: current_user.contacts_list %>
           </div>
         </div>
         <div class="modal-footer">

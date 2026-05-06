@@ -1,6 +1,8 @@
 class Holonew < ApplicationRecord
   belongs_to :sender, class_name: "User", foreign_key: "user_id"
   belongs_to :receiver, class_name: "User", foreign_key: "target_user", optional: true
+  belongs_to :target_npc_character, class_name: "NpcCharacter", optional: true
+  belongs_to :sender_npc_character, class_name: "NpcCharacter", optional: true
   has_many :readers, through: :holonew_reads, source: :user
   has_many :holonew_reads, dependent: :destroy
   has_one_attached :image
@@ -14,7 +16,9 @@ class Holonew < ApplicationRecord
   after_create_commit :update_holonews_counter
 
   def update_holonews_counter
-    users = if target_user.present?
+    users = if target_npc_character_id.present?
+              target_npc_character&.users.to_a
+            elsif target_user.present?
               [User.find(target_user)]
             elsif target_group.present? || target_group == 'all'
               User.all

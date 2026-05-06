@@ -8,8 +8,15 @@
       <% @holonews.each do |holonew| %>
         <div class="holonew-item p-1 mb-1 <%= current_user.has_read?(holonew) ? 'bg-light' : 'bg-warning' %> rounded">
           <h3><%= holonew.title %></h3>
+          <% sender_label = if holonew.sender_alias.present?
+                              holonew.sender_alias
+                            elsif holonew.sender_npc_character.present?
+                              holonew.sender_npc_character.name
+                            else
+                              holonew.sender.display_name_for(current_user)
+                            end %>
           <p>
-            <strong>Expéditeur :</strong> <%= holonew.sender_alias.presence || holonew.sender.username %>
+            <strong>Expéditeur :</strong> <%= sender_label %>
             <%= link_to new_holonew_path(reply_to: holonew.id), class: "ms-2 text-success", title: "Répondre" do %>
               <i class="fas fa-reply"></i>
             <% end %><br>

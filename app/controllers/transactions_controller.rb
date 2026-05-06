@@ -2,12 +2,8 @@ class TransactionsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_transfer_users, only: [:new, :create]
 
-  def new
-    @transaction = Transaction.new
-  end
-
   def create
-    receiver = User.where('LOWER(username) = ?', params[:transaction][:receiver_username].downcase).first
+    receiver = resolve_receiver(params[:transaction][:receiver_username])
 
     if receiver.nil?
       flash.now[:alert] = 'Destinataire introuvable'
@@ -19,7 +15,7 @@ class TransactionsController < ApplicationController
       render :new, status: :unprocessable_entity and return
     end
 
-    unless current_user.is_contact?(receiver.id) || receiver.is_pnj?
+    unless current_user.is_contact?(receiver) || receiver.is_pnj?
       flash.now[:alert] = 'Vous ne pouvez transférer des crédits qu\'à vos contacts.'
       render :new, status: :unprocessable_entity and return
     end
@@ -49,22 +45,36 @@ class TransactionsController < ApplicationController
     render :new, status: :internal_server_error
   end
 
+  def new
+    @transaction = Transaction.new
+  end
+
   private
 
   def transaction_params
     params.require(:transaction).permit(:amount, :receiver_username)
   end
 
+  # Receiver can be matched by username (PJ/PNJ direct account) or by NpcCharacter name
+  # (in which case credits go to the first user incarnating that character).
+  def resolve_receiver(name)
+    return nil if name.blank?
+    name = name.strip
+
+    user = User.where('LOWER(username) = ?', name.downcase).first
+    return user if user
+
+    npc = NpcCharacter.where('LOWER(name) = ?', name.downcase).first
+    npc&.users&.first
+  end
+
   def set_transfer_users
-    contact_ids = current_user.contacts || []
-    @contact_users = User.where(id: contact_ids)
-                         .where.not(id: current_user.id)
-                         .includes(avatar_attachment: :blob)
-                         .order(:username)
+    @contacts = current_user.contacts_list
     @pnj_users = User.pnj_contacts
                      .where.not(id: current_user.id)
                      .includes(avatar_attachment: :blob)
                      .order(:username)
-    @transfer_users = @contact_users + @pnj_users
+    @npc_characters = NpcCharacter.order(:name)
+    @transfer_users = @contacts + @pnj_users
   end
 end

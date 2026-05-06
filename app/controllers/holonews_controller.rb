@@ -2,16 +2,16 @@ class HolonewsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    if current_user.group.name == 'MJ' || current_user.group.name == 'PNJ'
+    if current_user.mj? || current_user.pnj?
       @holonews = Holonew.includes(:sender).order(created_at: :desc).page(params[:page]).per(10)
     else
       @holonews = Holonew.includes(:sender)
-                          .where("target_group = ? OR target_user = ? OR target_group = ?", 
+                          .where("target_group = ? OR target_user = ? OR target_group = ?",
                                  current_user.group.name.to_s, current_user.id, 'all')
                           .order(created_at: :desc)
                           .page(params[:page]).per(10)
     end
-    
+
     unless params[:page]
       current_user.mark_holonews_as_read(@holonews)
     end
@@ -23,50 +23,63 @@ class HolonewsController < ApplicationController
 
   def new
     @holonew = Holonew.new
-    @users = User.all
     @groups = Group.all
 
     if params[:reply_to].present?
       original_holonew = Holonew.find(params[:reply_to])
       @holonew.title = "Re: #{original_holonew.title}"
-      @holonew.target_user = original_holonew.sender.id
-      @reply_to_username = original_holonew.sender.username
+      if original_holonew.sender_npc_character_id.present?
+        @reply_target = original_holonew.sender_npc_character
+      else
+        @reply_target = original_holonew.sender
+      end
     end
+
+    @recipient_options = build_recipient_options
+    @sender_npc_options = current_user.npc_characters.order(:name) if current_user.pnj?
   end
 
   def create
     @holonew = Holonew.new(holonew_params)
     @holonew.sender = current_user
-  
-    # Validation spécifique pour les PJ : vérifier que le destinataire est un contact
-    if current_user.group.name == "PJ" && params[:target_user].present?
-      target_user_id = params[:target_user].to_i
-      target_user = User.find_by(id: target_user_id)
 
-      unless current_user.is_contact?(target_user_id) || target_user&.is_pnj?
-        respond_to do |format|
-          format.html do
-            redirect_to new_holonew_path, alert: "Vous ne pouvez envoyer des messages qu'à vos contacts."
-          end
-        end
-        return
+    target = parse_target(params[:recipient])
+
+    if current_user.pj?
+      unless target_allowed_for_pj?(target)
+        return redirect_to new_holonew_path, alert: "Vous ne pouvez envoyer des messages qu'à vos contacts."
       end
-      
-      @holonew.target_user = target_user_id
-    elsif params[:send_to_all] == '1'
-      @holonew.target_user = nil
-      @holonew.target_group = 'all'
-    elsif params[:target_user].present?
-      @holonew.target_user = params[:target_user].to_i
-    elsif params[:target_group].present?
-      @holonew.target_group = params[:target_group]
     end
-  
+
+    case target
+    when Hash
+      if target[:type] == "user"
+        @holonew.target_user = target[:id]
+      elsif target[:type] == "npc_character"
+        npc = NpcCharacter.find_by(id: target[:id])
+        if npc
+          @holonew.target_npc_character = npc
+          @holonew.target_user = npc.users.first&.id
+        end
+      elsif target[:type] == "group"
+        @holonew.target_group = target[:id]
+      elsif target[:type] == "all"
+        @holonew.target_group = "all"
+      end
+    end
+
+    if current_user.pnj? && params[:sender_npc_character_id].present?
+      npc = current_user.npc_characters.find_by(id: params[:sender_npc_character_id])
+      @holonew.sender_npc_character = npc if npc
+    end
+
     if @holonew.save
       respond_to do |format|
         format.html { redirect_to new_holonew_path, notice: "Holonew envoyée" }
       end
     else
+      @recipient_options = build_recipient_options
+      @sender_npc_options = current_user.npc_characters.order(:name) if current_user.pnj?
       respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
       end
@@ -77,5 +90,63 @@ class HolonewsController < ApplicationController
 
   def holonew_params
     params.require(:holonew).permit(:title, :content, :image, :sender_alias).merge(user_id: current_user.id)
+  end
+
+  # recipient encoded as "user:<id>" / "npc:<id>" / "group:<name>" / "all"
+  def parse_target(value)
+    return nil if value.blank?
+
+    if value == "all"
+      { type: "all" }
+    elsif value.start_with?("user:")
+      { type: "user", id: value.split(":", 2).last.to_i }
+    elsif value.start_with?("npc:")
+      { type: "npc_character", id: value.split(":", 2).last.to_i }
+    elsif value.start_with?("group:")
+      { type: "group", id: value.split(":", 2).last }
+    end
+  end
+
+  def target_allowed_for_pj?(target)
+    return false if target.nil?
+    return true if target[:type] == "all"
+
+    case target[:type]
+    when "user"
+      user = User.find_by(id: target[:id])
+      user && (current_user.is_contact?(user) || user.pnj?)
+    when "npc_character"
+      npc = NpcCharacter.find_by(id: target[:id])
+      npc && current_user.is_contact?(npc)
+    when "group"
+      false
+    else
+      false
+    end
+  end
+
+  # Builds the recipient select options for the new holonew form
+  def build_recipient_options
+    if current_user.pj?
+      contacts_group = current_user.contacts_list.map do |c|
+        if c.is_a?(NpcCharacter)
+          [c.name, "npc:#{c.id}"]
+        else
+          [c.username, "user:#{c.id}"]
+        end
+      end
+      services_group = NpcCharacter.order(:name).map { |npc| [npc.name, "npc:#{npc.id}"] }
+      [
+        ["Contacts", contacts_group],
+        ["Services", services_group]
+      ]
+    else
+      users_group = User.order(:username).map { |u| [u.username, "user:#{u.id}"] }
+      npcs_group = NpcCharacter.order(:name).map { |npc| [npc.name, "npc:#{npc.id}"] }
+      [
+        ["Joueurs", users_group],
+        ["Personnages PNJ", npcs_group]
+      ]
+    end
   end
 end

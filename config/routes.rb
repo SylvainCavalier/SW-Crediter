@@ -9,6 +9,10 @@ Rails.application.routes.draw do
   get "team" => "pages#team", as: :team
   patch "users/:id/avatar_upload", to: "pages#avatar_upload", as: :avatar_upload
 
+  # Choix du nom de personnage à la première connexion (PJ)
+  get  "character_name", to: "character_names#new",    as: :new_character_name
+  post "character_name", to: "character_names#create", as: :character_name
+
   # Users (profils simplifiés)
   resources :users, only: [:show] do
     resources :inventory_objects, only: [:index, :create, :destroy]

@@ -14,6 +14,13 @@ class User < ApplicationRecord
   has_many :received_holonews, class_name: "Holonew", foreign_key: "target_user", primary_key: "id"
   has_many :holonew_reads, dependent: :destroy
   has_many :read_holonews, through: :holonew_reads, source: :holonew
+  has_many :npc_character_users, dependent: :destroy
+  has_many :npc_characters, through: :npc_character_users
+  has_many :user_contacts, dependent: :destroy
+  has_many :user_contact_entries,
+           class_name: "UserContact",
+           as: :contactable,
+           dependent: :destroy
   has_one_attached :avatar
 
   validates :username, presence: true, uniqueness: true
@@ -46,41 +53,73 @@ class User < ApplicationRecord
     end
   end
 
-  # Contacts methods
-  def add_contact(contact_username)
-    contact_user = User.find_by(username: contact_username)
-    return { success: false, error: "Utilisateur introuvable" } unless contact_user
+  # Contacts methods (polymorphic via UserContact)
+  def add_contact(name)
+    name = name.to_s.strip
+    return { success: false, error: "Nom requis" } if name.blank?
 
-    return { success: false, error: "Vous ne pouvez pas vous ajouter en tant que contact" } if contact_user.id == id
+    contactable = User.find_by("LOWER(username) = ?", name.downcase) ||
+                  NpcCharacter.find_by("LOWER(name) = ?", name.downcase)
+    return { success: false, error: "Utilisateur introuvable" } unless contactable
 
-    if contacts.include?(contact_user.id)
+    if contactable.is_a?(User) && contactable.id == id
+      return { success: false, error: "Vous ne pouvez pas vous ajouter en tant que contact" }
+    end
+
+    if user_contacts.exists?(contactable: contactable)
       return { success: false, error: "Ce contact existe deja" }
     end
 
-    self.contacts = (contacts || []).push(contact_user.id)
-    save ? { success: true, contact: contact_user } : { success: false, error: "Erreur lors de l'ajout du contact" }
+    user_contacts.create!(contactable: contactable)
+    { success: true, contact: contactable }
+  rescue ActiveRecord::RecordInvalid => e
+    { success: false, error: e.record.errors.full_messages.join(", ") }
   end
 
-  def remove_contact(contact_id)
-    self.contacts = (contacts || []).reject { |id| id == contact_id.to_i }
-    save ? { success: true } : { success: false, error: "Erreur lors de la suppression du contact" }
+  def remove_contact(contactable_type:, contactable_id:)
+    record = user_contacts.find_by(contactable_type: contactable_type, contactable_id: contactable_id)
+    return { success: false, error: "Contact introuvable" } unless record
+
+    record.destroy
+    { success: true }
   end
 
-  def get_contacts
-    return [] if contacts.blank?
-    User.where(id: contacts).select(:id, :username)
+  def contacts_list
+    user_contacts.includes(:contactable).map(&:contactable).compact
   end
 
-  def is_contact?(user_id)
-    contacts.include?(user_id.to_i) if contacts.present?
+  def is_contact?(contactable)
+    return false if contactable.nil?
+    user_contacts.exists?(contactable_type: contactable.class.name, contactable_id: contactable.id)
+  end
+
+  def pj?
+    group&.name == "PJ"
+  end
+
+  def pnj?
+    group&.name == "PNJ"
+  end
+
+  def mj?
+    group&.name == "MJ"
   end
 
   def is_pnj?
-    group.name == "PNJ"
+    pnj?
   end
 
   def self.pnj_contacts
     joins(:group).where(groups: { name: "PNJ" })
+  end
+
+  # Display name: real first name for PNJ when seen by another PNJ/MJ; fallback to username.
+  def display_name_for(viewer = nil)
+    if pnj? && viewer && (viewer.pnj? || viewer.mj?) && real_first_name.present?
+      real_first_name
+    else
+      username
+    end
   end
 
   def name

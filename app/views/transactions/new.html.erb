@@ -24,27 +24,30 @@
           <select name="transaction[receiver_username]" id="transaction_receiver_username" class="form-control" data-controller="tom-select">
             <option value="">Sélectionnez un destinataire</option>
 
-            <% if @contact_users.any? %>
+            <% if @contacts.any? %>
               <optgroup label="Contacts">
-                <% @contact_users.each do |user| %>
-                  <% avatar_url = user.avatar.attached? ? url_for(user.avatar) : "" %>
-                  <option value="<%= user.username %>"
-                          data-avatar-url="<%= avatar_url %>"
-                          data-text="<%= user.username %>">
-                    <%= user.username %>
-                  </option>
+                <% @contacts.each do |contact| %>
+                  <% if contact.is_a?(NpcCharacter) %>
+                    <option value="<%= contact.name %>" data-text="<%= contact.name %>">
+                      <%= contact.name %>
+                    </option>
+                  <% else %>
+                    <% avatar_url = contact.avatar.attached? ? url_for(contact.avatar) : "" %>
+                    <option value="<%= contact.username %>"
+                            data-avatar-url="<%= avatar_url %>"
+                            data-text="<%= contact.username %>">
+                      <%= contact.username %>
+                    </option>
+                  <% end %>
                 <% end %>
               </optgroup>
             <% end %>
 
-            <% if @pnj_users.any? %>
+            <% if @npc_characters.any? %>
               <optgroup label="Services">
-                <% @pnj_users.each do |user| %>
-                  <% avatar_url = user.avatar.attached? ? url_for(user.avatar) : "" %>
-                  <option value="<%= user.username %>"
-                          data-avatar-url="<%= avatar_url %>"
-                          data-text="<%= user.username %>">
-                    <%= user.username %>
+                <% @npc_characters.each do |npc| %>
+                  <option value="<%= npc.name %>" data-text="<%= npc.name %>">
+                    <%= npc.name %>
                   </option>
                 <% end %>
               </optgroup>

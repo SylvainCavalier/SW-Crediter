@@ -4,30 +4,103 @@ group_pnj = Group.find_or_create_by!(name: "PNJ", description: "Le groupe des ma
 group_pj = Group.find_or_create_by!(name: "PJ", description: "Les joueurs jouent au jeu")
 group_hackers = Group.find_or_create_by!(name: "Hackers", description: "Les hackers peuvent hacker les données des autres")
 
-puts "Creating users..."
-
-# MJ
-unless User.find_by("LOWER(username) = ?", "sylvain")
-  User.create!(username: "Sylvain", email: "sylvain@sw-gn.com", password: "adminsw", credits: 100000, group: group_mj)
-  puts "Sylvain (MJ) créé"
+puts "Cleaning up obsolete test accounts..."
+%w[Agent\ B-47 Technicien\ Comm Cantinier Droïde\ de\ Service Jawas].each do |obsolete_username|
+  user = User.find_by("LOWER(username) = ?", obsolete_username.downcase)
+  if user
+    user.destroy
+    puts "Deleted test account: #{obsolete_username}"
+  end
 end
 
-# Agent B-47 (PJ test)
-unless User.find_by("LOWER(username) = ?", "agent b-47")
-  User.create!(username: "Agent B-47", email: "agentb47@sw-gn.com", password: "password", group: group_pj, credits: 100)
-  puts "Agent B-47 créé"
+puts "Renaming MJ Sylvain if needed..."
+existing_mj = User.find_by("LOWER(username) = ?", "sylvain")
+if existing_mj && existing_mj.group_id == group_mj.id
+  existing_mj.update!(username: "MJ Sylvain")
+  puts "Renamed MJ account 'Sylvain' to 'MJ Sylvain'"
 end
 
-# PNJ (contacts pré-enregistrés)
-[
-  { username: "Technicien Comm", email: "techcomm@sw-gn.com" },
-  { username: "Cantinier", email: "cantinier@sw-gn.com" },
-  { username: "Droïde de Service", email: "droide@sw-gn.com" },
-  { username: "Jawas", email: "jawas@sw-gn.com" }
-].each do |pnj|
-  unless User.find_by("LOWER(username) = ?", pnj[:username].downcase)
-    User.create!(username: pnj[:username], email: pnj[:email], password: "pnjpassword", group: group_pnj, credits: 0)
-    puts "#{pnj[:username]} (PNJ) créé"
+puts "Creating MJ account..."
+unless User.find_by("LOWER(username) = ?", "mj sylvain")
+  User.create!(
+    username: "MJ Sylvain",
+    email: "mj@sw-gn.com",
+    password: "adminsw",
+    credits: 100000,
+    group: group_mj
+  )
+  puts "MJ Sylvain créé"
+end
+
+puts "Creating PJ accounts (one per class)..."
+# username = login_name (no accents), character_class = display label (with accents),
+# password = login_name (no spaces, lowercase) + 2 random hardcoded digits.
+pj_classes = [
+  { username: "Technicienne", character_class: "Technicienne", password: "technicienne47" },
+  { username: "Prospecteur",  character_class: "Prospecteur",  password: "prospecteur23" },
+  { username: "Ascete",       character_class: "Ascète",       password: "ascete81" },
+  { username: "Braconnier",   character_class: "Braconnier",   password: "braconnier56" },
+  { username: "Senateur",     character_class: "Sénateur",     password: "senateur92" },
+  { username: "Analyste",     character_class: "Analyste",     password: "analyste18" },
+  { username: "Maitre Jedi",  character_class: "Maître Jedi",  password: "maitrejedi34" },
+  { username: "Padawan",      character_class: "Padawan",      password: "padawan65" },
+  { username: "Amiral",       character_class: "Amiral",       password: "amiral07" },
+  { username: "Pilote",       character_class: "Pilote",       password: "pilote73" },
+  { username: "Chasseur",     character_class: "Chasseur",     password: "chasseur29" }
+]
+
+pj_classes.each do |pj|
+  email = "#{pj[:username].downcase.delete(' ')}@sw-gn.com"
+  user = User.find_by("LOWER(username) = ?", pj[:username].downcase)
+  if user
+    user.update!(password: pj[:password], character_class: pj[:character_class])
+  else
+    User.create!(
+      username: pj[:username],
+      email: email,
+      password: pj[:password],
+      credits: 100,
+      group: group_pj,
+      character_class: pj[:character_class],
+      character_name_chosen: false
+    )
+  end
+  puts "PJ #{pj[:username]} (mot de passe: #{pj[:password]})"
+end
+
+# PJ pré-existants (avant la refactorisation) : on les considère comme déjà nommés
+# pour ne pas les bloquer au login.
+group_pj.users.where(character_class: nil).update_all(character_name_chosen: true)
+
+puts "Creating PNJ accounts..."
+# Hardcoded passwords (prénom sans accent + chiffres random) so the seed is reproducible.
+pnj_accounts = [
+  { username: "Marine",   real_first_name: "Marine",   password: "marine42",   characters: ["Twy'la"] },
+  { username: "Brendan",  real_first_name: "Brendan",  password: "brendan87",  characters: ["Maitre Valeon Kalisteas", "Dali Marien"] },
+  { username: "Elise",    real_first_name: "Elise",    password: "elise19",    characters: ["Kallyu Gray"] },
+  { username: "Sylvain",  real_first_name: "Sylvain",  password: "sylvain63",  characters: ["Mankel Yvlada", "Dali Marien"] },
+  { username: "Noe",      real_first_name: "Noé",      password: "noe742",     characters: ["Copper Barley", "Chancelier"] },
+  { username: "Pia",      real_first_name: "Pia",      password: "pia519",     characters: ["Max Mayer"] },
+  { username: "Aurelie",  real_first_name: "Aurélie",  password: "aurelie33",  characters: ["Siitra"] },
+  { username: "Aurelien", real_first_name: "Aurélien", password: "aurelien04", characters: ["Lurba Dinguin"] }
+]
+
+pnj_accounts.each do |pnj|
+  user = User.find_by("LOWER(username) = ?", pnj[:username].downcase)
+  user ||= User.create!(
+    username: pnj[:username],
+    email: "#{pnj[:username].downcase}@sw-gn.com",
+    password: pnj[:password],
+    credits: 0,
+    group: group_pnj,
+    real_first_name: pnj[:real_first_name]
+  )
+  user.update!(real_first_name: pnj[:real_first_name]) if user.real_first_name != pnj[:real_first_name]
+  puts "PNJ #{pnj[:username]} (mot de passe: #{pnj[:password]})"
+
+  pnj[:characters].each do |character_name|
+    npc = NpcCharacter.find_or_create_by!(name: character_name)
+    NpcCharacterUser.find_or_create_by!(user: user, npc_character: npc)
   end
 end
 

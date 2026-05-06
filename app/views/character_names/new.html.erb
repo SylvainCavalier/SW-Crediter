@@ -1,0 +1,32 @@
+<div class="frame-container" style="position: relative; width: 100%; min-height: 100vh;">
+  <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
+
+  <div class="custom-form" style="padding: 2rem;">
+    <h2 class="text-success text-center mb-3">Choisis ton nom de personnage</h2>
+
+    <p class="text-center text-info mb-4">
+      Bienvenue, <strong><%= current_user.character_class %></strong>.<br>
+      Avant de pouvoir utiliser ton comlink, choisis le nom que ton personnage portera tout au long du jeu.
+      Une fois validé, ce nom servira aussi à te connecter.
+    </p>
+
+    <% if flash[:alert] %>
+      <div class="alert alert-danger"><%= flash[:alert] %></div>
+    <% end %>
+
+    <%= form_with url: character_name_path, method: :post, local: true do |f| %>
+      <div class="form-group">
+        <%= label_tag :character_name, "Nom de personnage" %>
+        <%= text_field_tag :character_name, nil,
+              class: "form-control",
+              required: true,
+              autofocus: true,
+              placeholder: "Ex : Hera Syndulla" %>
+      </div>
+
+      <div class="form-group mt-4 text-center">
+        <%= submit_tag "Valider", class: "btn btn-outline-success" %>
+      </div>
+    <% end %>
+  </div>
+</div>

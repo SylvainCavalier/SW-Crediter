@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_22_143846) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_06_133526) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -69,6 +69,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_22_143846) do
     t.string "target_group"
     t.boolean "read", default: false
     t.string "sender_alias"
+    t.bigint "target_npc_character_id"
+    t.bigint "sender_npc_character_id"
+    t.index ["sender_npc_character_id"], name: "index_holonews_on_sender_npc_character_id"
+    t.index ["target_npc_character_id"], name: "index_holonews_on_target_npc_character_id"
     t.index ["user_id"], name: "index_holonews_on_user_id"
   end
 
@@ -80,6 +84,23 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_22_143846) do
     t.string "rarity"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "npc_character_users", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "npc_character_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["npc_character_id"], name: "index_npc_character_users_on_npc_character_id"
+    t.index ["user_id", "npc_character_id"], name: "index_npc_char_users_on_user_and_npc", unique: true
+    t.index ["user_id"], name: "index_npc_character_users_on_user_id"
+  end
+
+  create_table "npc_characters", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((name)::text)", name: "index_npc_characters_on_lower_name", unique: true
   end
 
   create_table "pazaak_games", force: :cascade do |t|
@@ -184,6 +205,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_22_143846) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "user_contacts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "contactable_type", null: false
+    t.bigint "contactable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contactable_type", "contactable_id"], name: "index_user_contacts_on_contactable"
+    t.index ["user_id", "contactable_type", "contactable_id"], name: "index_user_contacts_uniqueness", unique: true
+    t.index ["user_id"], name: "index_user_contacts_on_user_id"
+  end
+
   create_table "user_inventory_objects", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "inventory_object_id", null: false
@@ -207,9 +239,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_22_143846) do
     t.string "username"
     t.bigint "group_id", null: false
     t.jsonb "pazaak_deck", default: []
-    t.jsonb "contacts", default: [], null: false
     t.datetime "last_subsidy_at"
-    t.index ["contacts"], name: "index_users_on_contacts", using: :gin
+    t.string "character_class"
+    t.string "real_first_name"
+    t.boolean "character_name_chosen", default: false, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["group_id"], name: "index_users_on_group_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -219,7 +252,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_22_143846) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "holonew_reads", "holonews"
   add_foreign_key "holonew_reads", "users"
+  add_foreign_key "holonews", "npc_characters", column: "sender_npc_character_id"
+  add_foreign_key "holonews", "npc_characters", column: "target_npc_character_id"
   add_foreign_key "holonews", "users"
+  add_foreign_key "npc_character_users", "npc_characters"
+  add_foreign_key "npc_character_users", "users"
   add_foreign_key "pazaak_games", "users", column: "guest_id"
   add_foreign_key "pazaak_games", "users", column: "host_id"
   add_foreign_key "pazaak_invitations", "pazaak_games"
@@ -228,6 +265,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_22_143846) do
   add_foreign_key "pazaak_presences", "users"
   add_foreign_key "pazaak_stats", "users"
   add_foreign_key "subscriptions", "users"
+  add_foreign_key "user_contacts", "users"
   add_foreign_key "user_inventory_objects", "inventory_objects"
   add_foreign_key "user_inventory_objects", "users"
   add_foreign_key "users", "groups"
