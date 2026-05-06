@@ -62,8 +62,10 @@ export default class extends Controller {
   }
 
   showPermissionDeniedHelp() {
-    this.statusTarget.innerHTML =
-      "Acces a la camera bloque. Pour reactiver : touchez l'icone <strong>cadenas</strong> (ou les <strong>trois points</strong>) a cote de l'URL en haut de la page, puis Autorisations &gt; Camera &gt; Autoriser, puis rechargez la page."
+    const standalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches
+    this.statusTarget.innerHTML = standalone
+      ? "Acces a la camera bloque. Pour reactiver depuis l'app installee : <strong>appui long sur l'icone de l'application</strong> sur l'ecran d'accueil &gt; <em>Infos sur l'app</em> &gt; <em>Autorisations</em> &gt; <em>Camera</em> &gt; <em>Autoriser</em>, puis rouvrez l'app."
+      : "Acces a la camera bloque. Pour reactiver : touchez l'icone <strong>cadenas</strong> (ou les <strong>trois points</strong>) a cote de l'URL en haut de la page &gt; <em>Autorisations</em> &gt; <em>Camera</em> &gt; <em>Autoriser</em>, puis rechargez la page."
   }
 
   async requestCameraStream() {
