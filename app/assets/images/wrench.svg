@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="wrench-grad" x1="40" y1="40" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#005693"/>
+      <stop offset="1" stop-color="#00a2c1"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <path fill="#00a8c1" stroke="url(#wrench-grad)" stroke-width="3" stroke-linejoin="round"
+          d="M178.5,28.4c-19.7-7.6-42.7-3.4-58.5,12.4-15.4,15.4-19.8,37.6-13.2,57L29.6,175c-7.7,7.7-7.7,20.3,0,28l7.4,7.4c7.7,7.7,20.3,7.7,28,0l77.2-77.2c19.4,6.6,41.6,2.2,57-13.2,15.8-15.8,20-38.8,12.4-58.5-.6-1.5-2.5-2-3.7-.8l-26.4,26.4c-2.7,2.7-7.1,2.7-9.8,0l-12.5-12.5c-2.7-2.7-2.7-7.1,0-9.8l26.4-26.4c1.2-1.2.7-3.1-.8-3.7Z"/>
+    <circle fill="url(#wrench-grad)" cx="55" cy="185" r="9"/>
+  </g>
+</svg>

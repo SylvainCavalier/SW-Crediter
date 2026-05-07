@@ -116,6 +116,17 @@ class User < ApplicationRecord
     false
   end
 
+  def can_access_wantedex?
+    return true if character_class == "Chasseur"
+    return true if can_manage_wantedex?
+
+    false
+  end
+
+  def can_manage_wantedex?
+    pnj? || mj?
+  end
+
   def can_access_force_vision?
     return true if ["Maître Jedi", "Padawan"].include?(character_class)
     return true if can_manage_force_vision?

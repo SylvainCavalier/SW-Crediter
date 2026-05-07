@@ -63,6 +63,10 @@ Rails.application.routes.draw do
   delete 'force_visions/:id', to: 'force_visions#destroy', as: :force_vision_admin
   get 'force_visions/:qr_token', to: 'force_visions#show', as: :force_vision
 
+  # Wantedex (primes de Ch'arsaac)
+  get 'wantedex', to: 'bounties#index', as: :wantedex
+  resources :bounties, only: [:create, :destroy]
+
   # Pazaak (jeu de cartes)
   namespace :pazaak do
     resource :menu, only: :show, controller: :menus

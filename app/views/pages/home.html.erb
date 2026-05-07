@@ -79,7 +79,14 @@
     <% end %>
     <% if current_user.can_access_repairs? %>
       <%= link_to repairs_scan_path do %>
-        <img src="<%= asset_path('target.svg') %>" alt="Reparations" class="ui-function">
+        <img src="<%= asset_path('wrench.svg') %>" alt="Reparations" class="ui-function">
+      <% end %>
+    <% else %>
+      <img src="<%= asset_path('wrench.svg') %>" alt="Function UI" class="ui-function">
+    <% end %>
+    <% if current_user.can_access_wantedex? %>
+      <%= link_to wantedex_path do %>
+        <img src="<%= asset_path('target.svg') %>" alt="Wantedex" class="ui-function">
       <% end %>
     <% else %>
       <img src="<%= asset_path('target.svg') %>" alt="Function UI" class="ui-function">

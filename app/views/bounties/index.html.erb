@@ -1,0 +1,105 @@
+<div class="frame-container" style="position: relative; width: 100%; height: 100vh;">
+  <p class="username-display mt-1 text-primary fw-bold">
+    <%= current_user.username.titleize %>
+  </p>
+
+  <div class="wantedex-container">
+    <h2 class="wantedex-title">WANTEDEX</h2>
+    <p class="wantedex-subtitle">Primes - Ch'arsaac</p>
+
+    <% if current_user.can_manage_wantedex? %>
+      <%= form_with(model: @bounty, url: bounties_path, local: true,
+                    html: { multipart: true, class: "wantedex-form", data: { direct_upload_url: rails_direct_uploads_path } }) do |form| %>
+        <% if @bounty.errors.any? %>
+          <div class="text-danger small mb-2">
+            <%= @bounty.errors.full_messages.join(", ") %>
+          </div>
+        <% end %>
+
+        <legend>Nouvelle prime</legend>
+
+        <div class="mb-2">
+          <%= form.text_field :name, placeholder: "Nom de la cible", class: "form-control form-control-sm", required: true %>
+        </div>
+        <div class="mb-2">
+          <%= form.text_area :description, placeholder: "Description (apparence, gang, planete d'origine...)", rows: 2, class: "form-control form-control-sm" %>
+        </div>
+        <div class="mb-2">
+          <%= form.text_area :crime, placeholder: "Crime", rows: 2, class: "form-control form-control-sm" %>
+        </div>
+        <div class="mb-2">
+          <%= form.number_field :reward, placeholder: "Montant de la prime (credits)", min: 0, class: "form-control form-control-sm", required: true %>
+        </div>
+        <div class="mb-2">
+          <%= form.select :dead_or_alive,
+                [["Mort ou vif", true], ["En vie uniquement", false]],
+                {},
+                class: "form-select form-select-sm" %>
+        </div>
+        <div class="mb-2">
+          <%= form.file_field :image, accept: "image/*", class: "form-control form-control-sm", direct_upload: true %>
+        </div>
+        <%= form.submit "Publier la prime", class: "btn btn-sm w-100 btn-wantedex" %>
+      <% end %>
+    <% end %>
+
+    <% if @bounties.any? %>
+      <% @bounties.each do |bounty| %>
+        <article class="wanted-poster">
+          <% if current_user.can_manage_wantedex? %>
+            <%= button_to bounty_path(bounty), method: :delete,
+                          data: { turbo_confirm: "Supprimer cette prime ?" },
+                          class: "wanted-delete",
+                          form: { style: "margin: 0;" } do %>
+              <i class="fa-solid fa-trash"></i>
+            <% end %>
+          <% end %>
+
+          <div class="wanted-header">
+            <h3 class="wanted-title">WANTED</h3>
+            <div class="wanted-status"><%= bounty.status_label %></div>
+          </div>
+
+          <div class="wanted-image-frame">
+            <% if bounty.image.attached? %>
+              <%= image_tag bounty.image, alt: bounty.name %>
+            <% else %>
+              <div class="wanted-image-placeholder">
+                <span>IMAGE NON DISPONIBLE</span>
+              </div>
+            <% end %>
+          </div>
+
+          <h4 class="wanted-name"><%= bounty.name %></h4>
+
+          <% if bounty.description.present? %>
+            <div class="wanted-field">
+              <span class="label">Signalement</span>
+              <%= simple_format(bounty.description, {}, wrapper_tag: "span") %>
+            </div>
+          <% end %>
+
+          <% if bounty.crime.present? %>
+            <div class="wanted-field">
+              <span class="label">Crime</span>
+              <%= simple_format(bounty.crime, {}, wrapper_tag: "span") %>
+            </div>
+          <% end %>
+
+          <div class="wanted-reward">
+            <span class="label">Prime</span>
+            <span class="amount"><%= number_with_delimiter(bounty.reward) %> crd</span>
+          </div>
+        </article>
+      <% end %>
+    <% else %>
+      <p class="wantedex-empty">Aucune prime active.</p>
+    <% end %>
+
+    <div class="mt-3 text-center">
+      <%= link_to root_path, class: "btn btn-sm btn-wantedex" do %>
+        <i class="fa-solid fa-arrow-left"></i> Retour
+      <% end %>
+    </div>
+  </div>
+</div>

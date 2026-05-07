@@ -6,7 +6,9 @@ export default class extends Controller {
 
   connect() {
     this.player = new Plyr(this.videoTarget, {
-      controls: ["play", "progress", "current-time", "mute", "volume", "fullscreen"]
+      controls: ["play", "progress", "current-time", "mute", "volume", "fullscreen"],
+      autoplay: true,
+      muted: true
     })
   }
 

@@ -1,0 +1,45 @@
+class BountiesController < ApplicationController
+  before_action :authenticate_user!
+  before_action :require_wantedex_access
+  before_action :require_wantedex_management, only: [:create, :destroy]
+
+  def index
+    @bounties = Bounty.order(created_at: :desc)
+    @bounty = Bounty.new
+  end
+
+  def create
+    @bounty = Bounty.new(bounty_params)
+
+    if @bounty.save
+      redirect_to wantedex_path, notice: "Prime ajoutee."
+    else
+      @bounties = Bounty.order(created_at: :desc)
+      render :index, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    @bounty = Bounty.find(params[:id])
+    @bounty.destroy
+    redirect_to wantedex_path, notice: "Prime supprimee."
+  end
+
+  private
+
+  def bounty_params
+    params.require(:bounty).permit(:name, :description, :crime, :reward, :dead_or_alive, :image)
+  end
+
+  def require_wantedex_access
+    return if current_user.can_access_wantedex?
+
+    redirect_to root_path, alert: "Vous n'avez pas acces au Wantedex."
+  end
+
+  def require_wantedex_management
+    return if current_user.can_manage_wantedex?
+
+    redirect_to wantedex_path, alert: "Reserve aux PNJ."
+  end
+end
