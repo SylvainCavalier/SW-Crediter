@@ -2,6 +2,7 @@ require "net/http"
 require "json"
 require "base64"
 require "uri"
+require "mini_magick"
 
 class BountyImageStylizer
   API_URL  = "https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/predictions".freeze
@@ -84,10 +85,23 @@ class BountyImageStylizer
   end
 
   def data_uri
-    blob = @bounty.image.blob
-    bytes = @bounty.image.download
-    mime = blob.content_type.presence || "image/jpeg"
-    "data:#{mime};base64,#{Base64.strict_encode64(bytes)}"
+    bytes = oriented_bytes
+    "data:image/jpeg;base64,#{Base64.strict_encode64(bytes)}"
+  end
+
+  # Bake the EXIF orientation into the actual pixels: Replicate (and most
+  # image pipelines) ignore the EXIF Orientation tag, so a portrait phone
+  # photo gets fed in sideways otherwise.
+  def oriented_bytes
+    raw = @bounty.image.download
+    image = MiniMagick::Image.read(raw)
+    image.auto_orient
+    image.strip
+    image.format("jpg")
+    image.to_blob
+  rescue => e
+    Rails.logger.warn("[BountyImageStylizer] auto_orient failed (#{e.class}: #{e.message}), sending raw bytes")
+    raw
   end
 
   def replace_attachment(url)
