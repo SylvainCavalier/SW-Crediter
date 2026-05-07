@@ -2,6 +2,7 @@ class BountiesController < ApplicationController
   before_action :authenticate_user!
   before_action :require_wantedex_access
   before_action :require_wantedex_management, only: [:create, :destroy]
+  before_action :require_chasseur, only: [:track, :eliminate]
 
   def index
     @bounties = Bounty.order(created_at: :desc)
@@ -27,7 +28,25 @@ class BountiesController < ApplicationController
     redirect_to wantedex_path, notice: "Prime supprimee."
   end
 
+  def track
+    bounty = Bounty.find(params[:id])
+    bounty.toggle_tracked!
+    redirect_to wantedex_path
+  end
+
+  def eliminate
+    bounty = Bounty.find(params[:id])
+    bounty.toggle_eliminated!
+    redirect_to wantedex_path
+  end
+
   private
+
+  def require_chasseur
+    return if current_user.character_class == "Chasseur"
+
+    redirect_to wantedex_path, alert: "Reserve aux chasseurs de primes."
+  end
 
   def enqueue_stylization(bounty)
     bounty_id = bounty.id

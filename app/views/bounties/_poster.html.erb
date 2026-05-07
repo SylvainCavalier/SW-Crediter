@@ -1,0 +1,87 @@
+<%= turbo_frame_tag "bounty_#{bounty.id}", class: "wanted-poster #{'wanted-poster--tracked' if bounty.tracked?} #{'wanted-poster--eliminated' if bounty.eliminated?}" do %>
+  <% if viewer_role == :manager %>
+    <%= button_to bounty_path(bounty), method: :delete,
+                  data: { turbo_confirm: "Supprimer cette prime ?", turbo_frame: "_top" },
+                  class: "wanted-delete",
+                  form: { style: "margin: 0;" } do %>
+      <i class="fa-solid fa-trash"></i>
+    <% end %>
+  <% end %>
+
+  <div class="wanted-header">
+    <h3 class="wanted-title">WANTED</h3>
+    <div class="wanted-status"><%= bounty.status_label %></div>
+  </div>
+
+  <div class="wanted-image-frame">
+    <% if bounty.image.attached? %>
+      <%= image_tag bounty.image, alt: bounty.name %>
+    <% else %>
+      <div class="wanted-image-placeholder">
+        <span>IMAGE NON DISPONIBLE</span>
+      </div>
+    <% end %>
+
+    <% if bounty.stylizing? %>
+      <div class="wanted-stylizing-overlay">
+        <div class="wanted-stylizing-spinner"></div>
+        <span>Stylisation holographique...</span>
+      </div>
+    <% end %>
+
+    <% if bounty.eliminated? %>
+      <div class="wanted-eliminated-overlay">
+        <div class="wanted-eliminated-cross"></div>
+        <span class="wanted-eliminated-label">CIBLE ELIMINEE</span>
+      </div>
+    <% end %>
+  </div>
+
+  <% if bounty.tracked? && !bounty.eliminated? %>
+    <div class="wanted-tracked-banner">
+      <i class="fa-solid fa-crosshairs"></i> En cours de traque
+    </div>
+  <% end %>
+
+  <h4 class="wanted-name"><%= bounty.name %></h4>
+
+  <% if bounty.description.present? %>
+    <div class="wanted-field">
+      <span class="label">Signalement</span>
+      <%= simple_format(bounty.description, {}, wrapper_tag: "span") %>
+    </div>
+  <% end %>
+
+  <% if bounty.crime.present? %>
+    <div class="wanted-field">
+      <span class="label">Crime</span>
+      <%= simple_format(bounty.crime, {}, wrapper_tag: "span") %>
+    </div>
+  <% end %>
+
+  <div class="wanted-reward">
+    <span class="label">Prime</span>
+    <span class="amount"><%= number_with_delimiter(bounty.reward) %> crd</span>
+  </div>
+
+  <% if viewer_role == :chasseur %>
+    <div class="wanted-actions">
+      <%= button_to track_bounty_path(bounty),
+                    data: { turbo_frame: "_top" },
+                    class: "wanted-action-btn #{'wanted-action-btn--active' if bounty.tracked?}",
+                    form: { style: "margin: 0;" } do %>
+        <i class="fa-solid fa-crosshairs"></i>
+        <%= bounty.tracked? ? "Arreter de traquer" : "Traquer" %>
+      <% end %>
+
+      <%= button_to eliminate_bounty_path(bounty),
+                    data: { turbo_frame: "_top",
+                            turbo_confirm: bounty.eliminated? ? nil : "Confirmer l'elimination de la cible ?" },
+                    class: "wanted-action-btn wanted-action-btn--danger #{'wanted-action-btn--active' if bounty.eliminated?}",
+                    form: { style: "margin: 0;" } do %>
+        <i class="fa-solid <%= bounty.eliminated? ? 'fa-rotate-left' : 'fa-skull' %>"></i>
+        <%= bounty.eliminated? ? "Annuler" : "Termine" %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

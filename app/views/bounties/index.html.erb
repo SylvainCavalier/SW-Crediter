@@ -1,4 +1,5 @@
-<%= turbo_stream_from "bounties" %>
+<% viewer_role = current_user.can_manage_wantedex? ? :manager : :chasseur %>
+<%= turbo_stream_from "bounties_#{viewer_role}" %>
 
 <div class="frame-container" style="position: relative; width: 100%; height: 100vh;">
   <div class="wantedex-container">
@@ -47,44 +48,7 @@
 
     <% if @bounties.any? %>
       <% @bounties.each do |bounty| %>
-        <article class="wanted-poster">
-          <% if current_user.can_manage_wantedex? %>
-            <%= button_to bounty_path(bounty), method: :delete,
-                          data: { turbo_confirm: "Supprimer cette prime ?" },
-                          class: "wanted-delete",
-                          form: { style: "margin: 0;" } do %>
-              <i class="fa-solid fa-trash"></i>
-            <% end %>
-          <% end %>
-
-          <div class="wanted-header">
-            <h3 class="wanted-title">WANTED</h3>
-            <div class="wanted-status"><%= bounty.status_label %></div>
-          </div>
-
-          <%= render "image_frame", bounty: bounty %>
-
-          <h4 class="wanted-name"><%= bounty.name %></h4>
-
-          <% if bounty.description.present? %>
-            <div class="wanted-field">
-              <span class="label">Signalement</span>
-              <%= simple_format(bounty.description, {}, wrapper_tag: "span") %>
-            </div>
-          <% end %>
-
-          <% if bounty.crime.present? %>
-            <div class="wanted-field">
-              <span class="label">Crime</span>
-              <%= simple_format(bounty.crime, {}, wrapper_tag: "span") %>
-            </div>
-          <% end %>
-
-          <div class="wanted-reward">
-            <span class="label">Prime</span>
-            <span class="amount"><%= number_with_delimiter(bounty.reward) %> crd</span>
-          </div>
-        </article>
+        <%= render "poster", bounty: bounty, viewer_role: viewer_role %>
       <% end %>
     <% else %>
       <p class="wantedex-empty">Aucune prime active.</p>

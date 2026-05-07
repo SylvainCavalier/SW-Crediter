@@ -40,7 +40,7 @@ class BountyImageStylizer
 
   def finalize!
     @bounty.update_columns(stylizing: false) if @bounty.persisted?
-    @bounty.broadcast_image_update
+    @bounty.broadcast_card_update
   rescue => e
     Rails.logger.error("[BountyImageStylizer] finalize failed: #{e.class}: #{e.message}")
   end

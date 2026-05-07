@@ -103,6 +103,7 @@ $wantedex-red: #ff2233;
 // ----- Wanted poster card -----
 
 .wanted-poster {
+  display: block;
   position: relative;
   border: 2px solid $wantedex-blue;
   border-radius: 10px;
@@ -113,6 +114,49 @@ $wantedex-red: #ff2233;
   box-shadow:
     0 0 14px rgba(0, 216, 255, 0.45),
     inset 0 0 18px rgba(0, 216, 255, 0.18);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+
+  &--tracked {
+    border-color: #fff;
+    box-shadow:
+      0 0 18px rgba(0, 216, 255, 0.95),
+      0 0 32px rgba(0, 216, 255, 0.7),
+      inset 0 0 22px rgba(0, 216, 255, 0.4);
+    animation: wantedex-tracked-pulse 2s ease-in-out infinite;
+  }
+
+  &--eliminated {
+    border-color: rgba(255, 34, 51, 0.7);
+    box-shadow:
+      0 0 14px rgba(255, 34, 51, 0.45),
+      inset 0 0 18px rgba(255, 34, 51, 0.18);
+    opacity: 0.92;
+
+    .wanted-title,
+    .wanted-name,
+    .wanted-status,
+    .wanted-field,
+    .wanted-reward .amount,
+    .wanted-reward .label {
+      filter: grayscale(0.4);
+    }
+  }
+}
+
+@keyframes wantedex-tracked-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 18px rgba(0, 216, 255, 0.95),
+      0 0 32px rgba(0, 216, 255, 0.7),
+      inset 0 0 22px rgba(0, 216, 255, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 26px rgba(0, 216, 255, 1),
+      0 0 48px rgba(0, 216, 255, 0.85),
+      inset 0 0 28px rgba(0, 216, 255, 0.55);
+  }
+}
 
   // Corner brackets
   &::before,
@@ -361,4 +405,137 @@ $wantedex-red: #ff2233;
   margin-top: 1rem;
   font-family: 'Audiowide', cursive;
   letter-spacing: 0.1em;
+}
+
+// ----- Tracked banner (under the image) -----
+
+.wanted-tracked-banner {
+  margin: -0.25rem auto 0.75rem;
+  width: 70%;
+  max-width: 240px;
+  padding: 0.3rem 0.5rem;
+  text-align: center;
+  font-family: 'Audiowide', cursive;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  color: #fff;
+  background: rgba(0, 216, 255, 0.18);
+  border: 1px solid $wantedex-blue;
+  border-radius: 4px;
+  text-shadow: 0 0 8px rgba(0, 216, 255, 0.85);
+  box-shadow: 0 0 10px rgba(0, 216, 255, 0.4);
+  animation: wantedex-pulse 1.6s ease-in-out infinite;
+
+  i {
+    margin-right: 0.4rem;
+    color: $wantedex-blue;
+  }
+}
+
+// ----- Eliminated overlay (red cross + label on image) -----
+
+.wanted-eliminated-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 2;
+}
+
+.wanted-eliminated-cross {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 8%;
+    right: 8%;
+    height: 7px;
+    background: $wantedex-red;
+    border-radius: 4px;
+    box-shadow:
+      0 0 10px rgba(255, 34, 51, 0.95),
+      0 0 22px rgba(255, 34, 51, 0.6);
+  }
+  &::before { transform: translateY(-50%) rotate(45deg); }
+  &::after  { transform: translateY(-50%) rotate(-45deg); }
+}
+
+.wanted-eliminated-label {
+  position: relative;
+  z-index: 1;
+  font-family: 'Audiowide', cursive;
+  font-size: 0.95rem;
+  letter-spacing: 0.18em;
+  color: #fff;
+  background: rgba(255, 34, 51, 0.85);
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 14px rgba(255, 34, 51, 0.85);
+  transform: rotate(-6deg);
+}
+
+// ----- Chasseur action buttons -----
+
+.wanted-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+
+  form {
+    flex: 1;
+  }
+}
+
+.wanted-action-btn {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  font-family: 'Audiowide', cursive;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: $wantedex-blue;
+  background: rgba(0, 216, 255, 0.08);
+  border: 1px solid $wantedex-blue;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i { margin-right: 0.3rem; }
+
+  &:hover {
+    color: #fff;
+    background: rgba(0, 216, 255, 0.22);
+    box-shadow: 0 0 10px rgba(0, 216, 255, 0.55);
+  }
+
+  &--active {
+    color: #fff;
+    background: rgba(0, 216, 255, 0.35);
+    box-shadow: 0 0 12px rgba(0, 216, 255, 0.7);
+  }
+
+  &--danger {
+    color: #ff8a92;
+    border-color: rgba(255, 34, 51, 0.7);
+    background: rgba(255, 34, 51, 0.08);
+
+    &:hover {
+      color: #fff;
+      background: rgba(255, 34, 51, 0.25);
+      box-shadow: 0 0 10px rgba(255, 34, 51, 0.6);
+    }
+
+    &.wanted-action-btn--active {
+      color: #fff;
+      background: rgba(255, 34, 51, 0.4);
+      box-shadow: 0 0 12px rgba(255, 34, 51, 0.7);
+    }
+  }
 }

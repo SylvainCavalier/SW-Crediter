@@ -65,7 +65,12 @@ Rails.application.routes.draw do
 
   # Wantedex (primes de Ch'arsaac)
   get 'wantedex', to: 'bounties#index', as: :wantedex
-  resources :bounties, only: [:create, :destroy]
+  resources :bounties, only: [:create, :destroy] do
+    member do
+      post :track
+      post :eliminate
+    end
+  end
 
   # Pazaak (jeu de cartes)
   namespace :pazaak do
