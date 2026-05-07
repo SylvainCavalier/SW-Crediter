@@ -5,7 +5,7 @@ require "uri"
 
 class BountyImageStylizer
   API_URL  = "https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/predictions".freeze
-  PROMPT   = "Stylized holographic futuristic version of this character, neon blue glow, sci-fi bounty hunter wanted poster aesthetic, dramatic backlight, semi-transparent hologram artifacts. Keep the face recognizable.".freeze
+  PROMPT   = "Add a subtle holographic sci-fi overlay to this photo. Keep the original photo, the person's face, pose, clothing, background and composition strictly identical - do not redraw, do not restyle, do not change the character. Only add: a light cyan-blue holographic tint, faint horizontal scanlines across the whole image, a soft neon glow on the silhouette edges, and very subtle digital glitch artifacts. The result must look like the same photo viewed through a futuristic hologram projector.".freeze
   POLL_INTERVAL = 2
   MAX_WAIT      = 90
 

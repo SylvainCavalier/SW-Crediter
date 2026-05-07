@@ -67,7 +67,8 @@ $wantedex-red: #ff2233;
     background: rgba(0, 0, 0, 0.5);
     border: 1px solid $wantedex-blue-soft;
     color: #fff;
-    font-size: 0.85rem;
+    // 16px minimum: prevents iOS Safari auto-zoom on input focus
+    font-size: 16px;
 
     &:focus {
       border-color: $wantedex-blue;
