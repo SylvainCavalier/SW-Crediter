@@ -6,7 +6,7 @@ require "mini_magick"
 
 class BountyImageStylizer
   API_URL  = "https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/predictions".freeze
-  PROMPT   = "Add a subtle holographic sci-fi overlay to this photo. Keep the original photo, the person's face, pose, clothing, background and composition strictly identical - do not redraw, do not restyle, do not change the character. Only add: a light cyan-blue holographic tint, faint horizontal scanlines across the whole image, a soft neon glow on the silhouette edges, and very subtle digital glitch artifacts. The result must look like the same photo viewed through a futuristic hologram projector.".freeze
+  PROMPT   = "Transform this photo into a sci-fi hologram projection of the same person. Keep the person's face, pose, body and clothing recognizable and in the same position - do not change their identity or composition. Apply a strong holographic effect: visible cyan-blue horizontal scanlines across the whole image, digital noise and grain, occasional horizontal glitch bands and chromatic aberration (red/blue color split on edges), semi-transparent flickering interference patterns, and slight signal distortion artifacts. Add a bright neon-blue rim light and glowing halo around the character's silhouette to clearly detach them from the background. The background should be darker and tinted deep blue/black, while the character glows with a holographic cyan-blue projection look. Style: futuristic sci-fi wanted poster hologram, dramatic, slightly ghostly, like a Star Wars holographic transmission.".freeze
   POLL_INTERVAL = 2
   MAX_WAIT      = 90
 
