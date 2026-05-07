@@ -1,11 +1,20 @@
 <%= turbo_frame_tag "bounty_#{bounty.id}", class: "wanted-poster #{'wanted-poster--tracked' if bounty.tracked?} #{'wanted-poster--eliminated' if bounty.eliminated?}" do %>
   <% if viewer_role == :manager %>
-    <%= button_to bounty_path(bounty), method: :delete,
-                  data: { turbo_confirm: "Supprimer cette prime ?", turbo_frame: "_top" },
-                  class: "wanted-delete",
-                  form: { style: "margin: 0;" } do %>
-      <i class="fa-solid fa-trash"></i>
-    <% end %>
+    <div class="wanted-manager-controls">
+      <%= link_to edit_bounty_path(bounty),
+                  class: "wanted-edit",
+                  data: { turbo_frame: "_top" },
+                  title: "Modifier" do %>
+        <i class="fa-solid fa-pen-to-square"></i>
+      <% end %>
+      <%= button_to bounty_path(bounty), method: :delete,
+                    data: { turbo_confirm: "Supprimer cette prime ?", turbo_frame: "_top" },
+                    class: "wanted-delete",
+                    form: { style: "margin: 0;" },
+                    title: "Supprimer" do %>
+        <i class="fa-solid fa-trash"></i>
+      <% end %>
+    </div>
   <% end %>
 
   <div class="wanted-header">
@@ -56,6 +65,13 @@
     <div class="wanted-field">
       <span class="label">Crime</span>
       <%= simple_format(bounty.crime, {}, wrapper_tag: "span") %>
+    </div>
+  <% end %>
+
+  <% if bounty.requester.present? %>
+    <div class="wanted-field">
+      <span class="label">Demandeur</span>
+      <span><%= bounty.requester %></span>
     </div>
   <% end %>
 

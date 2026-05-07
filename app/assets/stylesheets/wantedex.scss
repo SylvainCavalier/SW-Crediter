@@ -141,22 +141,6 @@ $wantedex-red: #ff2233;
       filter: grayscale(0.4);
     }
   }
-}
-
-@keyframes wantedex-tracked-pulse {
-  0%, 100% {
-    box-shadow:
-      0 0 18px rgba(0, 216, 255, 0.95),
-      0 0 32px rgba(0, 216, 255, 0.7),
-      inset 0 0 22px rgba(0, 216, 255, 0.4);
-  }
-  50% {
-    box-shadow:
-      0 0 26px rgba(0, 216, 255, 1),
-      0 0 48px rgba(0, 216, 255, 0.85),
-      inset 0 0 28px rgba(0, 216, 255, 0.55);
-  }
-}
 
   // Corner brackets
   &::before,
@@ -179,6 +163,21 @@ $wantedex-red: #ff2233;
     right: -5px;
     border-left: none;
     border-top: none;
+  }
+}
+
+@keyframes wantedex-tracked-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 18px rgba(0, 216, 255, 0.95),
+      0 0 32px rgba(0, 216, 255, 0.7),
+      inset 0 0 22px rgba(0, 216, 255, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 26px rgba(0, 216, 255, 1),
+      0 0 48px rgba(0, 216, 255, 0.85),
+      inset 0 0 28px rgba(0, 216, 255, 0.55);
   }
 }
 
@@ -313,17 +312,43 @@ $wantedex-red: #ff2233;
   }
 }
 
-.wanted-delete {
+.wanted-manager-controls {
   position: absolute;
   top: 6px;
   right: 8px;
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+}
+
+.wanted-edit,
+.wanted-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 0.75rem;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.wanted-edit {
+  border: 1px solid rgba(0, 216, 255, 0.6);
+  color: $wantedex-blue;
+
+  &:hover {
+    color: #fff;
+    background: rgba(0, 216, 255, 0.18);
+    box-shadow: 0 0 8px rgba(0, 216, 255, 0.6);
+  }
+}
+
+.wanted-delete {
   border: 1px solid rgba(255, 34, 51, 0.6);
   color: $wantedex-red;
-  border-radius: 4px;
-  padding: 1px 6px;
-  font-size: 0.7rem;
-  z-index: 2;
 
   &:hover {
     background: rgba(255, 34, 51, 0.15);

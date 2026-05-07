@@ -7,43 +7,12 @@
     <p class="wantedex-subtitle">Primes - Ch'arsaac</p>
 
     <% if current_user.can_manage_wantedex? %>
-      <%= form_with(model: @bounty, url: bounties_path, local: true,
-                    html: { multipart: true, class: "wantedex-form",
-                            data: { direct_upload_url: rails_direct_uploads_path } }) do |form| %>
-        <% if @bounty.errors.any? %>
-          <div class="text-danger small mb-2">
-            <%= @bounty.errors.full_messages.join(", ") %>
-          </div>
-        <% end %>
-
-        <legend>Nouvelle prime</legend>
-
-        <div class="mb-2">
-          <%= form.text_field :name, placeholder: "Nom de la cible", class: "form-control form-control-sm", required: true %>
-        </div>
-        <div class="mb-2">
-          <%= form.text_area :description, placeholder: "Description (apparence, gang, planete d'origine...)", rows: 2, class: "form-control form-control-sm" %>
-        </div>
-        <div class="mb-2">
-          <%= form.text_area :crime, placeholder: "Crime", rows: 2, class: "form-control form-control-sm" %>
-        </div>
-        <div class="mb-2">
-          <%= form.number_field :reward, placeholder: "Montant de la prime (credits)", min: 0, class: "form-control form-control-sm", required: true %>
-        </div>
-        <div class="mb-2">
-          <%= form.select :dead_or_alive,
-                [["Mort ou vif", true], ["En vie uniquement", false]],
-                {},
-                class: "form-select form-select-sm" %>
-        </div>
-        <div class="mb-2">
-          <%= form.file_field :image, accept: "image/*", class: "form-control form-control-sm", direct_upload: true %>
-          <small class="d-block mt-1" style="color: rgba(0, 216, 255, 0.7); font-size: 0.7rem;">
-            L'image sera stylisee en hologramme futuriste, la stylisation s'affichera automatiquement quand elle sera prete.
-          </small>
-        </div>
-        <%= form.submit "Publier la prime", class: "btn btn-sm w-100 btn-wantedex" %>
-      <% end %>
+      <%= render "form",
+            bounty: @bounty,
+            form_url: bounties_path,
+            form_method: :post,
+            legend: "Nouvelle prime",
+            submit_label: "Publier la prime" %>
     <% end %>
 
     <% if @bounties.any? %>

@@ -1,7 +1,7 @@
 class BountiesController < ApplicationController
   before_action :authenticate_user!
   before_action :require_wantedex_access
-  before_action :require_wantedex_management, only: [:create, :destroy]
+  before_action :require_wantedex_management, only: [:create, :edit, :update, :destroy]
   before_action :require_chasseur, only: [:track, :eliminate]
 
   def index
@@ -19,6 +19,26 @@ class BountiesController < ApplicationController
     else
       @bounties = Bounty.order(created_at: :desc)
       render :index, status: :unprocessable_entity
+    end
+  end
+
+  def edit
+    @bounty = Bounty.find(params[:id])
+  end
+
+  def update
+    @bounty = Bounty.find(params[:id])
+    new_image_uploaded = bounty_params[:image].present?
+
+    if @bounty.update(bounty_params)
+      if new_image_uploaded
+        @bounty.update_columns(stylizing: true)
+        enqueue_stylization(@bounty)
+      end
+      @bounty.broadcast_card_update
+      redirect_to wantedex_path, notice: "Prime mise a jour."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -61,7 +81,7 @@ class BountiesController < ApplicationController
   end
 
   def bounty_params
-    params.require(:bounty).permit(:name, :description, :crime, :reward, :dead_or_alive, :image)
+    params.require(:bounty).permit(:name, :description, :crime, :reward, :mission_type, :requester, :image)
   end
 
   def require_wantedex_access

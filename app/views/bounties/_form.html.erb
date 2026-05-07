@@ -1,0 +1,45 @@
+<%= form_with(model: bounty, url: form_url, method: form_method, local: true,
+              html: { multipart: true, class: "wantedex-form",
+                      data: { direct_upload_url: rails_direct_uploads_path } }) do |form| %>
+  <% if bounty.errors.any? %>
+    <div class="text-danger small mb-2">
+      <%= bounty.errors.full_messages.join(", ") %>
+    </div>
+  <% end %>
+
+  <legend><%= legend %></legend>
+
+  <div class="mb-2">
+    <%= form.text_field :name, placeholder: "Nom de la cible", class: "form-control form-control-sm", required: true %>
+  </div>
+  <div class="mb-2">
+    <%= form.text_area :description, placeholder: "Description (apparence, gang, planete d'origine...)", rows: 2, class: "form-control form-control-sm" %>
+  </div>
+  <div class="mb-2">
+    <%= form.text_area :crime, placeholder: "Crime", rows: 2, class: "form-control form-control-sm" %>
+  </div>
+  <div class="mb-2">
+    <%= form.text_field :requester, placeholder: "Demandeur (qui emet la prime)", class: "form-control form-control-sm" %>
+  </div>
+  <div class="mb-2">
+    <%= form.number_field :reward, placeholder: "Montant de la prime (credits)", min: 0, class: "form-control form-control-sm", required: true %>
+  </div>
+  <div class="mb-2">
+    <%= form.select :mission_type,
+          Bounty::MISSION_TYPE_FORM_OPTIONS,
+          {},
+          class: "form-select form-select-sm" %>
+  </div>
+  <div class="mb-2">
+    <% if bounty.persisted? && bounty.image.attached? %>
+      <p class="mb-1" style="color: rgba(0, 216, 255, 0.75); font-size: 0.75rem;">
+        Image actuelle attachee. Selectionnez un nouveau fichier pour la remplacer.
+      </p>
+    <% end %>
+    <%= form.file_field :image, accept: "image/*", class: "form-control form-control-sm", direct_upload: true %>
+    <small class="d-block mt-1" style="color: rgba(0, 216, 255, 0.7); font-size: 0.7rem;">
+      Toute nouvelle image sera stylisee en hologramme futuriste, la stylisation s'affichera automatiquement quand elle sera prete.
+    </small>
+  </div>
+  <%= form.submit submit_label, class: "btn btn-sm w-100 btn-wantedex" %>
+<% end %>

@@ -65,7 +65,7 @@ Rails.application.routes.draw do
 
   # Wantedex (primes de Ch'arsaac)
   get 'wantedex', to: 'bounties#index', as: :wantedex
-  resources :bounties, only: [:create, :destroy] do
+  resources :bounties, only: [:create, :edit, :update, :destroy] do
     member do
       post :track
       post :eliminate

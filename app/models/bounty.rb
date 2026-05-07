@@ -1,11 +1,25 @@
 class Bounty < ApplicationRecord
   has_one_attached :image, service: :cloudinary
 
+  enum :mission_type, { alive_only: 0, dead_or_alive: 1, locate: 2 }, default: :alive_only
+
+  MISSION_TYPE_LABELS = {
+    "alive_only"    => "EN VIE UNIQUEMENT",
+    "dead_or_alive" => "MORT OU VIF",
+    "locate"        => "LOCALISER"
+  }.freeze
+
+  MISSION_TYPE_FORM_OPTIONS = [
+    ["En vie uniquement", "alive_only"],
+    ["Mort ou vif",       "dead_or_alive"],
+    ["Localiser",         "locate"]
+  ].freeze
+
   validates :name, presence: true
   validates :reward, numericality: { greater_than_or_equal_to: 0 }
 
   def status_label
-    dead_or_alive? ? "MORT OU VIF" : "EN VIE UNIQUEMENT"
+    MISSION_TYPE_LABELS[mission_type]
   end
 
   def toggle_tracked!
