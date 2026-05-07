@@ -1,0 +1,16 @@
+<%= turbo_frame_tag "bounty_#{bounty.id}_image", class: "wanted-image-frame" do %>
+  <% if bounty.image.attached? %>
+    <%= image_tag bounty.image, alt: bounty.name %>
+  <% else %>
+    <div class="wanted-image-placeholder">
+      <span>IMAGE NON DISPONIBLE</span>
+    </div>
+  <% end %>
+
+  <% if bounty.stylizing? %>
+    <div class="wanted-stylizing-overlay">
+      <div class="wanted-stylizing-spinner"></div>
+      <span>Stylisation holographique...</span>
+    </div>
+  <% end %>
+<% end %>

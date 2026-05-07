@@ -169,6 +169,7 @@ $wantedex-red: #ff2233;
 }
 
 .wanted-image-frame {
+  display: block;
   position: relative;
   width: 70%;
   max-width: 240px;
@@ -286,68 +287,49 @@ $wantedex-red: #ff2233;
   }
 }
 
-// ----- Loading overlay (image stylization) -----
+// ----- Stylization overlay (over the bounty image while AI works) -----
 
-.wantedex-loading-overlay {
-  position: fixed;
+.wanted-stylizing-overlay {
+  position: absolute;
   inset: 0;
-  z-index: 9999;
-  background: rgba(0, 8, 16, 0.92);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.wantedex-loading-box {
+  gap: 0.5rem;
+  background: rgba(0, 12, 24, 0.72);
+  color: $wantedex-blue;
+  font-family: 'Audiowide', cursive;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
   text-align: center;
-  padding: 2rem 2.5rem;
-  border: 1px solid $wantedex-blue;
-  border-radius: 10px;
-  background: rgba(0, 20, 35, 0.85);
-  box-shadow:
-    0 0 24px rgba(0, 216, 255, 0.5),
-    inset 0 0 24px rgba(0, 216, 255, 0.15);
+  text-shadow: 0 0 8px rgba(0, 216, 255, 0.7);
+  animation: wantedex-pulse 1.6s ease-in-out infinite;
+  z-index: 1;
+
+  span {
+    padding: 0 0.5rem;
+  }
 }
 
-.wantedex-spinner {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 1rem;
-  border: 3px solid rgba(0, 216, 255, 0.15);
+.wanted-stylizing-spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid rgba(0, 216, 255, 0.18);
   border-top-color: $wantedex-blue;
-  border-right-color: rgba(0, 216, 255, 0.6);
+  border-right-color: rgba(0, 216, 255, 0.55);
   border-radius: 50%;
   animation: wantedex-spin 1s linear infinite;
-  box-shadow: 0 0 14px rgba(0, 216, 255, 0.6);
+  box-shadow: 0 0 10px rgba(0, 216, 255, 0.6);
 }
 
 @keyframes wantedex-spin {
   to { transform: rotate(360deg); }
 }
 
-.wantedex-loading-text {
-  font-family: 'Audiowide', cursive;
-  color: $wantedex-blue;
-  font-size: 1rem;
-  letter-spacing: 0.18em;
-  margin: 0 0 0.4rem;
-  text-shadow: 0 0 10px rgba(0, 216, 255, 0.7);
-  animation: wantedex-pulse 1.6s ease-in-out infinite;
-}
-
-.wantedex-loading-sub {
-  color: rgba(0, 216, 255, 0.7);
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-  margin: 0;
-  font-family: 'Audiowide', cursive;
-}
-
 @keyframes wantedex-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
+  50% { opacity: 0.65; }
 }
 
 .wantedex-back-btn {

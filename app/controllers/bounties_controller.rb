@@ -10,10 +10,11 @@ class BountiesController < ApplicationController
 
   def create
     @bounty = Bounty.new(bounty_params)
+    @bounty.stylizing = true if @bounty.image.attached?
 
     if @bounty.save
-      BountyImageStylizer.call(@bounty) if @bounty.image.attached?
-      redirect_to wantedex_path, notice: "Prime ajoutee."
+      enqueue_stylization(@bounty) if @bounty.stylizing?
+      redirect_to wantedex_path, notice: "Prime publiee."
     else
       @bounties = Bounty.order(created_at: :desc)
       render :index, status: :unprocessable_entity
@@ -27,6 +28,18 @@ class BountiesController < ApplicationController
   end
 
   private
+
+  def enqueue_stylization(bounty)
+    bounty_id = bounty.id
+    Thread.new do
+      Rails.application.executor.wrap do
+        target = Bounty.find_by(id: bounty_id)
+        BountyImageStylizer.call(target) if target
+      end
+    rescue => e
+      Rails.logger.error("[BountiesController] stylization thread crashed: #{e.class}: #{e.message}")
+    end
+  end
 
   def bounty_params
     params.require(:bounty).permit(:name, :description, :crime, :reward, :dead_or_alive, :image)

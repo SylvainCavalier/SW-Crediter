@@ -1,3 +1,5 @@
+<%= turbo_stream_from "bounties" %>
+
 <div class="frame-container" style="position: relative; width: 100%; height: 100vh;">
   <div class="wantedex-container">
     <h2 class="wantedex-title">WANTEDEX</h2>
@@ -6,11 +8,7 @@
     <% if current_user.can_manage_wantedex? %>
       <%= form_with(model: @bounty, url: bounties_path, local: true,
                     html: { multipart: true, class: "wantedex-form",
-                            data: {
-                              controller: "wantedex-loading",
-                              direct_upload_url: rails_direct_uploads_path,
-                              action: "submit->wantedex-loading#show"
-                            } }) do |form| %>
+                            data: { direct_upload_url: rails_direct_uploads_path } }) do |form| %>
         <% if @bounty.errors.any? %>
           <div class="text-danger small mb-2">
             <%= @bounty.errors.full_messages.join(", ") %>
@@ -38,21 +36,12 @@
                 class: "form-select form-select-sm" %>
         </div>
         <div class="mb-2">
-          <%= form.file_field :image, accept: "image/*", class: "form-control form-control-sm", direct_upload: true,
-                                       data: { wantedex_loading_target: "fileInput" } %>
+          <%= form.file_field :image, accept: "image/*", class: "form-control form-control-sm", direct_upload: true %>
           <small class="d-block mt-1" style="color: rgba(0, 216, 255, 0.7); font-size: 0.7rem;">
-            L'image sera stylisee en hologramme futuriste (peut prendre 30 sec).
+            L'image sera stylisee en hologramme futuriste, la stylisation s'affichera automatiquement quand elle sera prete.
           </small>
         </div>
         <%= form.submit "Publier la prime", class: "btn btn-sm w-100 btn-wantedex" %>
-
-        <div data-wantedex-loading-target="overlay" class="wantedex-loading-overlay d-none">
-          <div class="wantedex-loading-box">
-            <div class="wantedex-spinner"></div>
-            <p class="wantedex-loading-text">Stylisation holographique<br>en cours...</p>
-            <p class="wantedex-loading-sub">Connexion au reseau Replicate</p>
-          </div>
-        </div>
       <% end %>
     <% end %>
 
@@ -73,15 +62,7 @@
             <div class="wanted-status"><%= bounty.status_label %></div>
           </div>
 
-          <div class="wanted-image-frame">
-            <% if bounty.image.attached? %>
-              <%= image_tag bounty.image, alt: bounty.name %>
-            <% else %>
-              <div class="wanted-image-placeholder">
-                <span>IMAGE NON DISPONIBLE</span>
-              </div>
-            <% end %>
-          </div>
+          <%= render "image_frame", bounty: bounty %>
 
           <h4 class="wanted-name"><%= bounty.name %></h4>
 

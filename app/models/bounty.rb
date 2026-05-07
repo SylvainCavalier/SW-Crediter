@@ -7,4 +7,13 @@ class Bounty < ApplicationRecord
   def status_label
     dead_or_alive? ? "MORT OU VIF" : "EN VIE UNIQUEMENT"
   end
+
+  def broadcast_image_update
+    broadcast_replace_to(
+      "bounties",
+      target: "bounty_#{id}_image",
+      partial: "bounties/image_frame",
+      locals: { bounty: self }
+    )
+  end
 end

@@ -33,6 +33,15 @@ class BountyImageStylizer
   rescue StylizationError, Net::OpenTimeout, Net::ReadTimeout, JSON::ParserError => e
     Rails.logger.error("[BountyImageStylizer] #{e.class}: #{e.message}")
     nil
+  ensure
+    finalize!
+  end
+
+  def finalize!
+    @bounty.update_columns(stylizing: false) if @bounty.persisted?
+    @bounty.broadcast_image_update
+  rescue => e
+    Rails.logger.error("[BountyImageStylizer] finalize failed: #{e.class}: #{e.message}")
   end
 
   private
