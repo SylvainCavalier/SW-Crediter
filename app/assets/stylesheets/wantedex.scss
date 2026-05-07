@@ -169,8 +169,9 @@ $wantedex-red: #ff2233;
 
 .wanted-image-frame {
   position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
+  width: 70%;
+  max-width: 240px;
+  aspect-ratio: 1 / 1;
   margin: 0 auto 0.75rem;
   border: 1px solid $wantedex-blue-soft;
   border-radius: 6px;
@@ -281,6 +282,92 @@ $wantedex-red: #ff2233;
   &:hover {
     background: rgba(255, 34, 51, 0.15);
     box-shadow: 0 0 8px rgba(255, 34, 51, 0.6);
+  }
+}
+
+// ----- Loading overlay (image stylization) -----
+
+.wantedex-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 8, 16, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.wantedex-loading-box {
+  text-align: center;
+  padding: 2rem 2.5rem;
+  border: 1px solid $wantedex-blue;
+  border-radius: 10px;
+  background: rgba(0, 20, 35, 0.85);
+  box-shadow:
+    0 0 24px rgba(0, 216, 255, 0.5),
+    inset 0 0 24px rgba(0, 216, 255, 0.15);
+}
+
+.wantedex-spinner {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  border: 3px solid rgba(0, 216, 255, 0.15);
+  border-top-color: $wantedex-blue;
+  border-right-color: rgba(0, 216, 255, 0.6);
+  border-radius: 50%;
+  animation: wantedex-spin 1s linear infinite;
+  box-shadow: 0 0 14px rgba(0, 216, 255, 0.6);
+}
+
+@keyframes wantedex-spin {
+  to { transform: rotate(360deg); }
+}
+
+.wantedex-loading-text {
+  font-family: 'Audiowide', cursive;
+  color: $wantedex-blue;
+  font-size: 1rem;
+  letter-spacing: 0.18em;
+  margin: 0 0 0.4rem;
+  text-shadow: 0 0 10px rgba(0, 216, 255, 0.7);
+  animation: wantedex-pulse 1.6s ease-in-out infinite;
+}
+
+.wantedex-loading-sub {
+  color: rgba(0, 216, 255, 0.7);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  margin: 0;
+  font-family: 'Audiowide', cursive;
+}
+
+@keyframes wantedex-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.wantedex-back-btn {
+  display: inline-block;
+  padding: 0.4rem 1.2rem;
+  font-family: 'Audiowide', cursive;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  color: #fff;
+  background: rgba(0, 216, 255, 0.15);
+  border: 1px solid $wantedex-blue;
+  border-radius: 6px;
+  text-decoration: none;
+  text-shadow: 0 0 6px rgba(0, 216, 255, 0.6);
+  box-shadow: 0 0 10px rgba(0, 216, 255, 0.35);
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #fff;
+    background: rgba(0, 216, 255, 0.3);
+    box-shadow: 0 0 14px rgba(0, 216, 255, 0.7);
   }
 }
 

@@ -1,15 +1,16 @@
 <div class="frame-container" style="position: relative; width: 100%; height: 100vh;">
-  <p class="username-display mt-1 text-primary fw-bold">
-    <%= current_user.username.titleize %>
-  </p>
-
   <div class="wantedex-container">
     <h2 class="wantedex-title">WANTEDEX</h2>
     <p class="wantedex-subtitle">Primes - Ch'arsaac</p>
 
     <% if current_user.can_manage_wantedex? %>
       <%= form_with(model: @bounty, url: bounties_path, local: true,
-                    html: { multipart: true, class: "wantedex-form", data: { direct_upload_url: rails_direct_uploads_path } }) do |form| %>
+                    html: { multipart: true, class: "wantedex-form",
+                            data: {
+                              controller: "wantedex-loading",
+                              direct_upload_url: rails_direct_uploads_path,
+                              action: "submit->wantedex-loading#show"
+                            } }) do |form| %>
         <% if @bounty.errors.any? %>
           <div class="text-danger small mb-2">
             <%= @bounty.errors.full_messages.join(", ") %>
@@ -37,9 +38,21 @@
                 class: "form-select form-select-sm" %>
         </div>
         <div class="mb-2">
-          <%= form.file_field :image, accept: "image/*", class: "form-control form-control-sm", direct_upload: true %>
+          <%= form.file_field :image, accept: "image/*", class: "form-control form-control-sm", direct_upload: true,
+                                       data: { wantedex_loading_target: "fileInput" } %>
+          <small class="d-block mt-1" style="color: rgba(0, 216, 255, 0.7); font-size: 0.7rem;">
+            L'image sera stylisee en hologramme futuriste (peut prendre 30 sec).
+          </small>
         </div>
         <%= form.submit "Publier la prime", class: "btn btn-sm w-100 btn-wantedex" %>
+
+        <div data-wantedex-loading-target="overlay" class="wantedex-loading-overlay d-none">
+          <div class="wantedex-loading-box">
+            <div class="wantedex-spinner"></div>
+            <p class="wantedex-loading-text">Stylisation holographique<br>en cours...</p>
+            <p class="wantedex-loading-sub">Connexion au reseau Replicate</p>
+          </div>
+        </div>
       <% end %>
     <% end %>
 
@@ -96,8 +109,8 @@
       <p class="wantedex-empty">Aucune prime active.</p>
     <% end %>
 
-    <div class="mt-3 text-center">
-      <%= link_to root_path, class: "btn btn-sm btn-wantedex" do %>
+    <div class="mt-3 mb-2 text-center">
+      <%= link_to root_path, class: "wantedex-back-btn" do %>
         <i class="fa-solid fa-arrow-left"></i> Retour
       <% end %>
     </div>

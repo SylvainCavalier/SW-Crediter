@@ -12,6 +12,7 @@ class BountiesController < ApplicationController
     @bounty = Bounty.new(bounty_params)
 
     if @bounty.save
+      BountyImageStylizer.call(@bounty) if @bounty.image.attached?
       redirect_to wantedex_path, notice: "Prime ajoutee."
     else
       @bounties = Bounty.order(created_at: :desc)
