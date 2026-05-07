@@ -15,7 +15,7 @@ class SendSubsidyHolonewJob < ApplicationJob
       content: "**BUREAU DES ALLOCATIONS BUDGÉTAIRES DU SECTEUR EXTERNE**\n" \
                "**Division du Contrôle et de la Conformité Financière**\n" \
                "Coruscant — District Fédéral du Sénat\n\n" \
-               "Citoyen(ne) #{user.username.titleize},\n\n" \
+               "Citoyen(ne) #{user.display_username},\n\n" \
                "Suite au traitement de votre demande de subvention républicaine " \
                "(Formulaire GR-7742-B/rev.38), nos services ont détecté une **anomalie de conformité** " \
                "dans votre dossier.\n\n" \

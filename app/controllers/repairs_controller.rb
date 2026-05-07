@@ -34,7 +34,7 @@ class RepairsController < ApplicationController
           if sender
             Holonew.create!(
               title: "Confirmation de service - GERVATEX",
-              content: "Agent #{current_user.username.titleize}, nous accusons reception de la reparation de l'equipement \"#{@repair.name}\". Le conglomerat GERVATEX est satisfait de vos services. Une prime de #{@repair.reward_credits} credits a ete creditee sur votre compte. Continuez votre excellent travail.",
+              content: "Agent #{current_user.display_username}, nous accusons reception de la reparation de l'equipement \"#{@repair.name}\". Le conglomerat GERVATEX est satisfait de vos services. Une prime de #{@repair.reward_credits} credits a ete creditee sur votre compte. Continuez votre excellent travail.",
               sender: sender,
               sender_alias: "GERVATEX Corp.",
               target_user: current_user.id

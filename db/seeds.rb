@@ -375,4 +375,25 @@ Repair.find_or_create_by!(qr_token: "0885ab4082c808bd") do |r|
   r.code = "217"
 end
 
+puts "Assigning starter Pazaak decks to PJ and PNJ..."
+
+starter_card_names = %w[+1 +2 +3 +4 +5]
+starter_quantity   = 2
+starter_cards      = InventoryObject.where(name: starter_card_names, category: "pazaak").index_by(&:name)
+
+User.joins(:group).where(groups: { name: %w[PJ PNJ] }).find_each do |user|
+  starter_card_names.each do |name|
+    card = starter_cards[name]
+    next unless card
+
+    uio = user.user_inventory_objects.find_or_initialize_by(inventory_object: card)
+    uio.quantity = [uio.quantity.to_i, starter_quantity].max
+    uio.save!
+  end
+
+  if user.pazaak_deck.blank?
+    user.update!(pazaak_deck: starter_card_names.flat_map { |n| [n, n] })
+  end
+end
+
 puts "Seed terminé !"

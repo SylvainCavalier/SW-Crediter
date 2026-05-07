@@ -1,6 +1,6 @@
 <div class="frame-container" style="position: relative; width: 100%; height: 100vh;">
   <p class="username-display mt-1 text-primary fw-bold">
-    <%= current_user.username.titleize %>
+    <%= current_user.display_username %>
   </p>
   <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
   <div class="holonews-container">
@@ -22,7 +22,7 @@
           <% recipient_label = if draft.target_npc_character.present?
                                  draft.target_npc_character.name
                                elsif draft.target_user.present?
-                                 User.find_by(id: draft.target_user)&.username || "?"
+                                 User.find_by(id: draft.target_user)&.display_username || "?"
                                elsif draft.target_group == "all"
                                  "Tous"
                                elsif draft.target_group.present?

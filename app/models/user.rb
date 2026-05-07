@@ -142,12 +142,17 @@ class User < ApplicationRecord
     joins(:group).where(groups: { name: "PNJ" })
   end
 
-  # Display name: real first name for PNJ when seen by another PNJ/MJ; fallback to username.
+  # Username formate pour l'affichage (capitalise via titleize)
+  def display_username
+    username.presence&.titleize
+  end
+
+  # Display name: real first name for PNJ when seen by another PNJ/MJ; fallback to display_username.
   def display_name_for(viewer = nil)
     if pnj? && viewer && (viewer.pnj? || viewer.mj?) && real_first_name.present?
       real_first_name
     else
-      username
+      display_username
     end
   end
 

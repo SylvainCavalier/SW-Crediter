@@ -1,7 +1,7 @@
 <div class="frame-container" style="position: relative; width: 100%; height: 100vh;">
   <!-- Username -->
   <p class="username-display mt-1 text-primary fw-bold">
-    <%= current_user.username %>
+    <%= current_user.display_username %>
   </p>
 
   <!-- Cadre principal SVG -->
@@ -9,10 +9,10 @@
   <!-- Formulaire -->
   <div class="custom-form">
     <%= simple_form_for @holonew, local: true do |f| %>
-      <% if @reply_target.present? %>
+      <% if @reply_to_id.present? %>
+        <%= hidden_field_tag :reply_to, @reply_to_id %>
         <div class="alert alert-info">
-          Réponse à
-          <%= @reply_target.is_a?(NpcCharacter) ? @reply_target.name : @reply_target.username %>
+          Réponse à <%= @reply_display_label %>
         </div>
       <% end %>
 
@@ -26,7 +26,7 @@
             <label>Envoyer en tant que</label>
             <%= select_tag 'sender_npc_character_id',
                 options_from_collection_for_select(@sender_npc_options, 'id', 'name'),
-                prompt: "Mon prénom réel (#{current_user.real_first_name || current_user.username})",
+                prompt: "Mon prénom réel (#{current_user.real_first_name || current_user.display_username})",
                 class: 'form-control' %>
           </div>
         <% end %>
@@ -51,7 +51,7 @@
         <% if current_user.pj? %>
           <label>Envoyer à :</label>
           <%= select_tag 'recipient',
-              grouped_options_for_select(@recipient_options),
+              grouped_options_for_select(@recipient_options, @reply_recipient_value),
               { prompt: "Sélectionner un contact", class: "form-control" } %>
           <small class="text-muted">Vous ne pouvez envoyer qu'à vos contacts ou aux services. Ajoutez-en en cliquant sur "Mes Contacts".</small>
           <div class="mb-2">
@@ -62,7 +62,7 @@
         <% else %>
           <label>Envoyer à :</label>
           <%= select_tag 'recipient',
-              grouped_options_for_select(@recipient_options) +
+              grouped_options_for_select(@recipient_options, @reply_recipient_value) +
                 "<optgroup label='Diffusion'><option value='all'>Tous</option></optgroup>".html_safe,
               { prompt: "Sélectionner un destinataire", class: "form-control" } %>
         <% end %>

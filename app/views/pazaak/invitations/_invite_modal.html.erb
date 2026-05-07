@@ -5,7 +5,7 @@
         <h5 class="modal-title">Invitation Pazaak</h5>
       </div>
       <div class="modal-body">
-        <p><%= inviter.username || inviter.email %> vous invite à jouer au Pazaak.</p>
+        <p><%= inviter.display_username || inviter.email %> vous invite à jouer au Pazaak.</p>
         <% if invitation.respond_to?(:stake) %>
           <p>Mise: <strong><%= invitation.stake %> crédits</strong></p>
         <% end %>

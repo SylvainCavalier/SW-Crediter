@@ -11,7 +11,7 @@
           <!-- Joueurs -->
           <% users.each do |user| %>
             <div class="player-box border rounded p-3 mb-3" data-user-id="<%= user.id %>">
-              <p><strong>Nom : </strong><%= user.username.capitalize %></p>
+              <p><strong>Nom : </strong><%= user.display_username %></p>
               <p class="player-hp" data-hp-max="<%= user.hp_max %>"><strong>PV : </strong><%= user.hp_current %> / <%= user.hp_max %></p>
               <p class="player-status">
                 <strong>Statut : </strong>

@@ -10,7 +10,7 @@
               <div class="avatar-placeholder" style="width: 30px; height: 30px; border-radius: 50%; background-color: #ccc;"></div>
             <% end %>
             <strong>
-              <%= contact.is_a?(NpcCharacter) ? contact.name : contact.username %>
+              <%= contact.is_a?(NpcCharacter) ? contact.name : contact.display_username %>
             </strong>
           </div>
           <%= button_to "Retirer",

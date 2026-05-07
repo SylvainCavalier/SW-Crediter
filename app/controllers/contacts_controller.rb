@@ -56,6 +56,6 @@ class ContactsController < ApplicationController
   private
 
   def contact_display_name(contactable)
-    contactable.is_a?(NpcCharacter) ? contactable.name : contactable.username
+    contactable.is_a?(NpcCharacter) ? contactable.name : contactable.display_username
   end
 end

@@ -21,7 +21,7 @@
   </div>
 
   <!-- Titre -->
-  <h1 class="text-success text-center mb-4">Profil de <%= @user.username.titleize %></h1>
+  <h1 class="text-success text-center mb-4">Profil de <%= @user.display_username %></h1>
 
   <!-- Section Inventaire -->
   <% if @inventory_items.any? %>

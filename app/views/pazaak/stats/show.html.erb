@@ -27,9 +27,9 @@
     </div>
     <div class="col-md-4">
       <ul class="list-group">
-        <li class="list-group-item d-flex justify-content-between"><span>Playmate</span><strong><%= User.find_by(id: @stats.playmate_user_id)&.username || '-' %></strong></li>
-        <li class="list-group-item d-flex justify-content-between"><span>Némésis</span><strong><%= User.find_by(id: @stats.nemesis_user_id)&.username || '-' %></strong></li>
-        <li class="list-group-item d-flex justify-content-between"><span>Victime</span><strong><%= User.find_by(id: @stats.victim_user_id)&.username || '-' %></strong></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Playmate</span><strong><%= User.find_by(id: @stats.playmate_user_id)&.display_username || '-' %></strong></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Némésis</span><strong><%= User.find_by(id: @stats.nemesis_user_id)&.display_username || '-' %></strong></li>
+        <li class="list-group-item d-flex justify-content-between"><span>Victime</span><strong><%= User.find_by(id: @stats.victim_user_id)&.display_username || '-' %></strong></li>
       </ul>
     </div>
   </div>

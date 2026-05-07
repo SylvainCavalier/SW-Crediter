@@ -7,7 +7,7 @@
   <% if game.finished? %>
     <h5>Partie terminée — VICTOIRES: Hôte <%= game.wins_host %> | Invité <%= game.wins_guest %></p>
   <% else %>
-    <h5>Manche <%= game.round_number %> — Tour de: <strong><%= User.find(game.current_turn_user_id).username rescue "?" %></strong></p>
+    <h5>Manche <%= game.round_number %> — Tour de: <strong><%= User.find(game.current_turn_user_id).display_username rescue "?" %></strong></p>
     <% if (inv = PazaakInvitation.find_by(pazaak_game_id: game.id)) && inv.stake.to_i > 0 %>
       <h5>Mise: <strong><%= inv.stake %> crédits</strong></p>
     <% end %>
