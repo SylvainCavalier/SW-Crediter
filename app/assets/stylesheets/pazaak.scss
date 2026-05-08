@@ -1,10 +1,18 @@
+.pazaak-container {
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow-y: auto;
+  padding: 1vh 0 1vh 0;
+}
+
 .pazaak-table {
   display: grid;
   grid-template-columns: 1fr 4px 1fr;
   align-items: start;
   gap: 16px;
   /* Variables responsives pour l'échelle des cartes */
-  --card-h: clamp(68px, 14vmin, 116px);
+  --card-h: clamp(56px, 11vmin, 116px);
   --card-w: calc(var(--card-h) * 0.6667);
   --radius: calc(var(--card-h) * 0.11);
   --border-w: max(1px, calc(var(--card-h) * 0.0185));
