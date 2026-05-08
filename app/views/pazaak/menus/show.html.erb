@@ -18,6 +18,9 @@
         <%= link_to "Deck", pazaak_deck_path, class: "btn btn-success neon-btn" %>
         <%= link_to "Jouer", pazaak_lobbies_path, class: "btn btn-success neon-btn" %>
         <%= link_to "Statistiques", pazaak_stats_path, class: "btn btn-secondary neon-btn" %>
+        <% if current_user.pnj? %>
+          <%= link_to "Donner une carte à un PJ", new_pazaak_gift_path, class: "btn btn-warning neon-btn" %>
+        <% end %>
       </div>
     </div>
   </div>

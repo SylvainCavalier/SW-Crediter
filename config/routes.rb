@@ -77,6 +77,7 @@ Rails.application.routes.draw do
     resource :menu, only: :show, controller: :menus
     resource :deck, only: [:show, :update], controller: :decks
     resource :stats, only: :show, controller: :stats
+    resource :gift, only: [:new, :create], controller: :gifts
     resources :lobbies, only: :index do
       collection do
         post :ping

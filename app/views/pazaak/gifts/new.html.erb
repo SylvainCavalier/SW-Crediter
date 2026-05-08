@@ -1,0 +1,33 @@
+<div class="frame-container" style="position: relative; width: 100%; height: 100svh;">
+  <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
+
+  <%= link_to "Retour", pazaak_menu_path, class: "btn btn-outline-secondary go-back" %>
+
+  <div class="custom-form" style="margin: 12vh auto;">
+    <h2 class="audiowide-regular text-center mb-4">Donner une carte à un PJ</h2>
+
+    <%= form_with url: pazaak_gift_path, method: :post, local: true do |f| %>
+      <div class="form-group">
+        <%= label_tag :inventory_object_id, "Carte" %>
+        <%= select_tag :inventory_object_id,
+              options_from_collection_for_select(@cards, :id, :name),
+              prompt: "Choisir une carte",
+              class: "form-select",
+              required: true %>
+      </div>
+
+      <div class="form-group">
+        <%= label_tag :recipient_id, "Destinataire (PJ)" %>
+        <%= select_tag :recipient_id,
+              options_from_collection_for_select(@pjs, :id, :display_username),
+              prompt: "Choisir un joueur",
+              class: "form-select",
+              required: true %>
+      </div>
+
+      <div class="text-center mt-4">
+        <%= f.submit "Donner la carte", class: "btn btn-success neon-btn" %>
+      </div>
+    <% end %>
+  </div>
+</div>
