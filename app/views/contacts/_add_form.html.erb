@@ -1,0 +1,16 @@
+<div id="add-contact-form-wrapper">
+  <%= form_with url: add_contacts_path, method: :post, id: "add-contact-form", class: "d-flex gap-2" do |f| %>
+    <%= f.text_field :contact_username,
+          placeholder: "Tape ou sélectionne un nom",
+          class: "form-control",
+          list: "contactable-names",
+          autocomplete: "off",
+          required: true %>
+    <%= f.submit "Ajouter", class: "btn btn-sm btn-outline-success" %>
+  <% end %>
+  <datalist id="contactable-names">
+    <% current_user.contactable_candidates.each do |name| %>
+      <option value="<%= name %>"></option>
+    <% end %>
+  </datalist>
+</div>

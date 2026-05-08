@@ -1,5 +1,5 @@
 class Bounty < ApplicationRecord
-  has_one_attached :image, service: :cloudinary
+  has_one_attached :image
 
   enum :mission_type, { alive_only: 0, dead_or_alive: 1, locate: 2 }, default: :alive_only
 

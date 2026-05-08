@@ -4,10 +4,7 @@
     
     <!-- Formulaire pour ajouter un contact -->
     <div class="add-contact-section mb-3">
-      <%= form_with url: add_contacts_path, method: :post, local: true, class: "d-flex gap-2" do |f| %>
-        <%= f.text_field :contact_username, placeholder: "Nom d'utilisateur ou personnage", class: "form-control", required: true %>
-        <%= f.submit "Ajouter", class: "btn btn-sm btn-outline-success" %>
-      <% end %>
+      <%= render "contacts/add_form" %>
       <div id="contact-error"></div>
     </div>
 

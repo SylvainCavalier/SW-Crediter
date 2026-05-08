@@ -16,8 +16,13 @@ class ContactsController < ApplicationController
     respond_to do |format|
       if result[:success]
         format.turbo_stream do
-          render turbo_stream: turbo_stream.replace("contacts-list",
-            partial: "contacts/list", locals: { contacts: current_user.contacts_list })
+          render turbo_stream: [
+            turbo_stream.replace("contacts-list",
+              partial: "contacts/list", locals: { contacts: current_user.contacts_list }),
+            turbo_stream.replace("add-contact-form-wrapper",
+              partial: "contacts/add_form"),
+            turbo_stream.update("contact-error", "")
+          ]
         end
         format.html { redirect_to new_holonew_path, notice: "Contact ajouté avec succès" }
         format.json { render json: result, status: :created }

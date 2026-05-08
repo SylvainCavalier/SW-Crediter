@@ -314,14 +314,16 @@ class PazaakGame < ApplicationRecord
   end
 
   def next_round!
-    # Alterner le premier joueur de la manche suivante
-    next_first = (first_player_id == host_id) ? guest_id : host_id
-    update!(round_number: round_number + 1, current_turn_user_id: next_first, first_player_id: next_first)
-    reset_round_state!(host)
-    reset_round_state!(guest)
-    # Tirage auto pour le nouveau premier joueur
-    draw_main_card_for!(User.find(next_first))
-    handle_auto_after_draw!(User.find(next_first))
+    with_lock do
+      # Alterner le premier joueur de la manche suivante
+      next_first = (first_player_id == host_id) ? guest_id : host_id
+      update!(round_number: round_number + 1, current_turn_user_id: next_first, first_player_id: next_first)
+      reset_round_state!(host)
+      reset_round_state!(guest)
+      # Tirage auto pour le nouveau premier joueur
+      draw_main_card_for!(User.find(next_first))
+      handle_auto_after_draw!(User.find(next_first))
+    end
   end
 
   def advance_turn!
@@ -348,28 +350,30 @@ class PazaakGame < ApplicationRecord
   end
 
   def apply_move!(user, action_type, value = nil)
-    return unless in_progress? && current_turn_user_id == user.id
-    # Si un bandeau de fin de manche est affiché, ignorer tout rendu/avancée (anti-remplacement précoce)
-    return if round_banner?
-    # Un joueur qui a validé (served) ne peut plus effectuer aucune action
-    st = player_state(user)
-    return if st && st["served"]
+    with_lock do
+      next unless in_progress? && current_turn_user_id == user.id
+      # Si un bandeau de fin de manche est affiché, ignorer tout rendu/avancée (anti-remplacement précoce)
+      next if round_banner?
+      # Un joueur qui a validé (served) ne peut plus effectuer aucune action
+      st = player_state(user)
+      next if st && st["served"]
 
-    case action_type
-    when "draw"
-      draw_main_card_for!(user)
-    when "play_special"
-      play_special_card!(user, value)
-      return
-    when "pass"
-      pass_turn!(user)
-      return
-    when "stand"
-      stand!(user)
-      return
+      case action_type
+      when "draw"
+        draw_main_card_for!(user)
+      when "play_special"
+        play_special_card!(user, value)
+        next
+      when "pass"
+        pass_turn!(user)
+        next
+      when "stand"
+        stand!(user)
+        next
+      end
+
+      check_round_end! unless finished?
     end
-
-    check_round_end! unless finished?
   end
 end
 

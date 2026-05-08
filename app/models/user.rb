@@ -21,7 +21,7 @@ class User < ApplicationRecord
            class_name: "UserContact",
            as: :contactable,
            dependent: :destroy
-  has_one_attached :avatar, service: :cloudinary
+  has_one_attached :avatar
 
   validates :username, presence: true, uniqueness: true
 
@@ -86,6 +86,16 @@ class User < ApplicationRecord
 
   def contacts_list
     user_contacts.includes(:contactable).map(&:contactable).compact
+  end
+
+  # Names offered by the contact-add datalist: every user + npc not
+  # already in this user's contacts (and not self).
+  def contactable_candidates
+    contacted_user_ids = user_contacts.where(contactable_type: "User").pluck(:contactable_id) + [id]
+    contacted_npc_ids = user_contacts.where(contactable_type: "NpcCharacter").pluck(:contactable_id)
+    users = User.where.not(id: contacted_user_ids).map(&:display_username).compact
+    npcs = NpcCharacter.where.not(id: contacted_npc_ids).pluck(:name)
+    (users + npcs).sort
   end
 
   def is_contact?(contactable)
