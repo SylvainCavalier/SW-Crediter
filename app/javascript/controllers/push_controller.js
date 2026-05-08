@@ -27,10 +27,12 @@ export default class extends Controller {
         });
       });
     }).then(subscription => {
-      if (subscription) {
-        console.log("📨 Envoi de l'abonnement au serveur...");
-        this.saveSubscription(subscription);
+      if (!subscription) return;
+      if (sessionStorage.getItem("pushSubscriptionEndpoint") === subscription.endpoint) {
+        return;
       }
+      console.log("📨 Envoi de l'abonnement au serveur...");
+      this.saveSubscription(subscription);
     }).catch(error => {
       console.error("❌ Erreur d'abonnement aux notifications :", error);
     });
@@ -51,7 +53,10 @@ export default class extends Controller {
         }
       })
     }).then(response => response.json())
-      .then(data => console.log("✅ Réponse du serveur :", data))
+      .then(data => {
+        console.log("✅ Réponse du serveur :", data);
+        sessionStorage.setItem("pushSubscriptionEndpoint", subscription.endpoint);
+      })
       .catch(error => console.error("❌ Erreur lors de l'envoi de l'abonnement :", error));
   }
 

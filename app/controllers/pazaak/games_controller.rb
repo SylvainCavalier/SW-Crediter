@@ -26,7 +26,10 @@ module Pazaak
     private
 
     def set_game
-      @game = PazaakGame.find(params[:id])
+      @game = PazaakGame.find_by(id: params[:id])
+      return if @game
+
+      redirect_to pazaak_path, alert: "Cette partie n'existe plus."
     end
   end
 end
