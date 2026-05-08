@@ -51,5 +51,27 @@
         <i class="fa-solid fa-arrow-left"></i> Retour
       <% end %>
     </div>
+
+    <% if current_user.pnj? %>
+      <hr class="border-success opacity-50 mt-4">
+      <div class="mt-3">
+        <h5 class="text-primary"><i class="fa-solid fa-clipboard-list"></i> Reparations effectuees</h5>
+        <% if @completed_repairs.any? %>
+          <ul class="list-unstyled mt-2">
+            <% @completed_repairs.each do |repair| %>
+              <li class="mb-2">
+                <strong><%= repair.name %></strong>
+                <div class="text-light" style="font-size: 0.85rem;">
+                  Par :
+                  <%= repair.repaired_by.map { |id| @repairers_by_id[id]&.display_username || "??" }.join(", ") %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-light" style="font-size: 0.85rem;">Aucune reparation effectuee pour l'instant.</p>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 </div>

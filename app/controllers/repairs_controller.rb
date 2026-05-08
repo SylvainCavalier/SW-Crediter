@@ -3,7 +3,11 @@ class RepairsController < ApplicationController
   before_action :require_repair_access
 
   def scan
-    # Page avec le scanner QR
+    if current_user.pnj?
+      @completed_repairs = Repair.where("jsonb_array_length(repaired_by) > 0").order(:name)
+      user_ids = @completed_repairs.flat_map(&:repaired_by).uniq
+      @repairers_by_id = User.where(id: user_ids).index_by(&:id)
+    end
   end
 
   def show

@@ -145,7 +145,7 @@ class HolonewsController < ApplicationController
     when "user"
       user = User.find_by(id: target[:id])
       return false unless user
-      current_user.is_contact?(user) || user.pnj? || matches_reply_sender?(target, reply_to_id)
+      current_user.is_contact?(user) || matches_reply_sender?(target, reply_to_id)
     when "npc_character"
       npc = NpcCharacter.find_by(id: target[:id])
       return false unless npc
@@ -192,10 +192,8 @@ class HolonewsController < ApplicationController
           [c.display_username, "user:#{c.id}"]
         end
       end
-      services_group = NpcCharacter.order(:name).map { |npc| [npc.name, "npc:#{npc.id}"] }
       [
-        ["Contacts", contacts_group],
-        ["Services", services_group]
+        ["Contacts", contacts_group]
       ]
     else
       users_group = User.order(:username).map { |u| [u.display_username, "user:#{u.id}"] }

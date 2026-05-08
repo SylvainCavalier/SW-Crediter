@@ -121,7 +121,7 @@ class User < ApplicationRecord
 
   def can_access_repairs?
     return true if %w[Technicienne Prospecteur].include?(character_class)
-    return true if pnj? && %w[sylvain noe].include?(username.to_s.downcase)
+    return true if pnj?
 
     false
   end
@@ -139,7 +139,7 @@ class User < ApplicationRecord
 
   def can_access_force_vision?
     return true if ["Maître Jedi", "Padawan"].include?(character_class)
-    return true if can_manage_force_vision?
+    return true if pnj?
 
     false
   end

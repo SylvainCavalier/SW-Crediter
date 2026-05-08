@@ -5,6 +5,7 @@ module Pazaak
     def index
       PazaakPresence.touch!(current_user)
       @players = PazaakPresence.recent.includes(:user).map(&:user)
+      @pending_outgoing = PazaakInvitation.pending.where(inviter_id: current_user.id).order(created_at: :desc).first
     end
 
     def ping

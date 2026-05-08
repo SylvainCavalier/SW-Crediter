@@ -4,10 +4,16 @@
       <% contacts.each do |contact| %>
         <li class="list-group-item d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-2">
-            <% if contact.is_a?(User) && contact.avatar.attached? %>
-              <%= image_tag contact.avatar, class: "avatar-small", style: "width: 30px; height: 30px; border-radius: 50%; object-fit: cover;" %>
+            <% if contact.is_a?(User) && contact.pj? %>
+              <% if contact.avatar.attached? %>
+                <%= image_tag contact.avatar, class: "avatar-small", style: "width: 30px; height: 30px; border-radius: 50%; object-fit: cover;" %>
+              <% else %>
+                <div class="avatar-placeholder" style="width: 30px; height: 30px; border-radius: 50%; background-color: #ccc;"></div>
+              <% end %>
             <% else %>
-              <div class="avatar-placeholder" style="width: 30px; height: 30px; border-radius: 50%; background-color: #ccc;"></div>
+              <div class="avatar-placeholder d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; border-radius: 50%; background-color: #2d3a2d; color: #8fce8f;" title="<%= contact.is_a?(NpcCharacter) ? 'Service' : 'PNJ' %>">
+                <i class="fas fa-user-secret" style="font-size: 14px;"></i>
+              </div>
             <% end %>
             <strong>
               <%= contact.is_a?(NpcCharacter) ? contact.name : contact.display_username %>

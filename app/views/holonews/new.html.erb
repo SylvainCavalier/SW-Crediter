@@ -53,12 +53,7 @@
           <%= select_tag 'recipient',
               grouped_options_for_select(@recipient_options, @reply_recipient_value),
               { prompt: "Sélectionner un contact", class: "form-control" } %>
-          <small class="text-muted">Vous ne pouvez envoyer qu'à vos contacts ou aux services. Ajoutez-en en cliquant sur "Mes Contacts".</small>
-          <div class="mb-2">
-            <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#contactsModal">
-              📇 Mes Contacts
-            </button>
-          </div>
+          <small class="text-muted">Vous ne pouvez envoyer qu'à vos contacts. Ajoutez-en depuis "Mes Contacts" sur la liste des Holonews.</small>
         <% else %>
           <label>Envoyer à :</label>
           <%= select_tag 'recipient',
@@ -78,32 +73,3 @@
     <% end %>
   </div>
 </div>
-
-<!-- Modale Contacts -->
-<% if current_user.pj? %>
-  <div class="modal fade" id="contactsModal" tabindex="-1" aria-labelledby="contactsModalLabel" aria-hidden="true" data-controller="contacts">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="contactsModalLabel">Mes Contacts</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Formulaire pour ajouter un contact -->
-          <div class="mb-3">
-            <%= render "contacts/add_form" %>
-            <div id="contact-error" class="mt-2"></div>
-          </div>
-
-          <!-- Liste des contacts -->
-          <div id="contacts-list">
-            <%= render "contacts/list", contacts: current_user.contacts_list %>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-        </div>
-      </div>
-    </div>
-  </div>
-<% end %>

@@ -4,10 +4,24 @@
   </p>
   <img src="<%= asset_path('cadre2.svg') %>" alt="Cadre" class="ui-frame">
   <div class="holonews-container">
+    <% if current_user.pj? %>
+      <div class="text-center mb-2">
+        <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#contactsModal">
+          📇 Mes Contacts
+        </button>
+      </div>
+    <% end %>
     <div class="holonews-list-container mx-2" data-controller="toggle-content">
       <% @holonews.each do |holonew| %>
-        <div class="holonew-item p-1 mb-1 <%= current_user.has_read?(holonew) ? 'bg-light' : 'bg-warning' %> rounded">
-          <h3><%= holonew.title %></h3>
+        <div class="holonew-item p-1 mb-1 <%= current_user.has_read?(holonew) ? 'bg-light' : 'bg-warning' %> rounded position-relative">
+          <% show_sender_avatar = holonew.sender_alias.blank? && holonew.sender_npc_character.blank? && holonew.sender&.avatar&.attached? %>
+          <% if show_sender_avatar %>
+            <%= image_tag holonew.sender.avatar,
+                          class: "rounded-circle position-absolute",
+                          style: "width: 28px; height: 28px; object-fit: cover; top: 6px; right: 6px; opacity: 0.85;",
+                          alt: holonew.sender.display_name_for(current_user) %>
+          <% end %>
+          <h3 <%= "style=\"padding-right: 36px;\"".html_safe if show_sender_avatar %>><%= holonew.title %></h3>
           <% sender_label = if holonew.sender_alias.present?
                               holonew.sender_alias
                             elsif holonew.sender_npc_character.present?
@@ -19,6 +33,19 @@
             <strong>Expéditeur :</strong> <%= sender_label %>
             <%= link_to new_holonew_path(reply_to: holonew.id), class: "ms-2 text-success", title: "Répondre" do %>
               <i class="fas fa-reply"></i>
+            <% end %>
+            <% if current_user.pj? && (contactable = holonew.contactable_sender) && contactable != current_user && !current_user.is_contact?(contactable) %>
+              <%= link_to "#",
+                    class: "ms-2 text-info",
+                    title: "Ajouter aux contacts",
+                    data: {
+                      bs_toggle: "modal",
+                      bs_target: "#addContactConfirmModal",
+                      contact_name: contactable.is_a?(NpcCharacter) ? contactable.name : contactable.username,
+                      contact_label: contactable.is_a?(NpcCharacter) ? contactable.name : contactable.display_username
+                    } do %>
+                <i class="fas fa-user-plus"></i>
+              <% end %>
             <% end %><br>
             <small class="text-muted text-success">
               Envoyé le <%= l(holonew.created_at, format: "%d/%m/%Y à %H:%M") %>
@@ -59,3 +86,54 @@
     <%= link_to "Brouillons", holonews_drafts_path, class: "btn btn-outline-warning", style: "position: absolute; top: 15%; left: 40%; z-index: 3;" %>
   <% end %>
 </div>
+
+<!-- Modale Contacts -->
+<% if current_user.pj? %>
+  <div class="modal fade" id="contactsModal" tabindex="-1" aria-labelledby="contactsModalLabel" aria-hidden="true" data-controller="contacts">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="contactsModalLabel">Mes Contacts</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Formulaire pour ajouter un contact -->
+          <div class="mb-3">
+            <%= render "contacts/add_form" %>
+            <div id="contact-error" class="mt-2"></div>
+          </div>
+
+          <!-- Liste des contacts -->
+          <div id="contacts-list">
+            <%= render "contacts/list", contacts: current_user.contacts_list %>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale de confirmation d'ajout depuis une holonew -->
+  <div class="modal fade" id="addContactConfirmModal" tabindex="-1" aria-hidden="true" data-controller="add-contact-confirm">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Ajouter aux contacts</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <%= form_with url: add_contacts_path, method: :post, local: true do %>
+          <div class="modal-body">
+            <p>Voulez-vous ajouter <strong data-add-contact-confirm-target="label"></strong> à votre liste de contacts ?</p>
+            <%= hidden_field_tag :contact_username, "", data: { "add-contact-confirm-target": "input" } %>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non</button>
+            <%= submit_tag "Oui", class: "btn btn-success" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

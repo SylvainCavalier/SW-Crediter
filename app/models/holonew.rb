@@ -15,6 +15,14 @@ class Holonew < ApplicationRecord
   scope :drafts, -> { where(draft: true) }
   scope :published, -> { where(draft: false) }
 
+  # Returns who could be added as a contact from this holonew, or nil if
+  # the sender is anonymized via an alias.
+  def contactable_sender
+    return nil if sender_alias.present?
+    return sender_npc_character if sender_npc_character.present?
+    sender
+  end
+
   after_create_commit :update_holonews_counter, unless: :draft?
 
   def update_holonews_counter
