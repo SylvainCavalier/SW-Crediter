@@ -52,6 +52,19 @@
                 <% end %>
               </optgroup>
             <% end %>
+
+            <% if @pj_users.any? %>
+              <optgroup label="Joueurs">
+                <% @pj_users.each do |pj| %>
+                  <% avatar_url = pj.avatar.attached? ? url_for(pj.avatar) : "" %>
+                  <option value="<%= pj.username %>"
+                          data-avatar-url="<%= avatar_url %>"
+                          data-text="<%= pj.username %>">
+                    <%= pj.display_username %>
+                  </option>
+                <% end %>
+              </optgroup>
+            <% end %>
           </select>
         </div>
 
