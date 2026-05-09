@@ -1,18 +1,20 @@
 class Bounty < ApplicationRecord
   has_one_attached :image
 
-  enum :mission_type, { alive_only: 0, dead_or_alive: 1, locate: 2 }, default: :alive_only
+  enum :mission_type, { alive_only: 0, dead_or_alive: 1, locate: 2, eliminate: 3 }, default: :alive_only
 
   MISSION_TYPE_LABELS = {
     "alive_only"    => "EN VIE UNIQUEMENT",
     "dead_or_alive" => "MORT OU VIF",
-    "locate"        => "LOCALISER"
+    "locate"        => "LOCALISER",
+    "eliminate"     => "ELIMINER"
   }.freeze
 
   MISSION_TYPE_FORM_OPTIONS = [
     ["En vie uniquement", "alive_only"],
     ["Mort ou vif",       "dead_or_alive"],
-    ["Localiser",         "locate"]
+    ["Localiser",         "locate"],
+    ["Eliminer",          "eliminate"]
   ].freeze
 
   validates :name, presence: true
