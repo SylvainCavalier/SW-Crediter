@@ -17,7 +17,7 @@
       <% end %>
 
       <div class="form-group">
-        <%= f.input :title, label: "Titre", input_html: { class: 'form-control' } %>
+        <%= f.input :title, label: "Titre", required: true, input_html: { class: 'form-control', required: true } %>
       </div>
 
       <% if current_user.pnj? %>
