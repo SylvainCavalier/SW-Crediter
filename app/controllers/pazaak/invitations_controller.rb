@@ -164,7 +164,7 @@ module Pazaak
     end
 
     def pair_in_game?(a_id, b_id)
-      PazaakGame.where(status: PazaakGame.statuses[:in_progress])
+      PazaakGame.active_in_progress
         .where("host_id IN (:ids) OR guest_id IN (:ids)", ids: [a_id, b_id])
         .exists?
     end

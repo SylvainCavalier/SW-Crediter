@@ -7,6 +7,13 @@ class PazaakGame < ApplicationRecord
   serialize :host_state, JSON
   serialize :guest_state, JSON
 
+  # Une partie in_progress depuis plus de ce délai est considérée abandonnée
+  # (joueur qui ferme l'app, FinishPazaakGameJob qui n'a pas tourné, etc.)
+  # et ne bloque plus les nouvelles invitations.
+  TTL = 30.minutes
+
+  scope :active_in_progress, -> { in_progress.where("started_at >= ?", TTL.ago) }
+
   validates :host, presence: true
   validate :guest_not_host
 
