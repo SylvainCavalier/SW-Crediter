@@ -112,7 +112,16 @@ module Pazaak
         partial: "pazaak/redirect",
         locals: { url: pazaak_game_path(game) }
       )
-      redirect_to pazaak_game_path(game)
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "pazaak_redirect",
+            partial: "pazaak/redirect",
+            locals: { url: pazaak_game_path(game) }
+          )
+        end
+        format.html { redirect_to pazaak_game_path(game) }
+      end
     end
 
     def decline_invitation(invitation)
