@@ -161,7 +161,7 @@ module Pazaak
     end
 
     def pending_for_user?(user_id)
-      PazaakInvitation.pending
+      PazaakInvitation.active_pending
         .where("inviter_id = :id OR invitee_id = :id", id: user_id)
         .exists?
     end

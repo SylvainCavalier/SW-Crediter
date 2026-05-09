@@ -5,6 +5,12 @@ class PazaakInvitation < ApplicationRecord
 
   enum status: { pending: 0, accepted: 1, declined: 2, expired: 3 }
 
+  # Une invitation pending non traitée au-delà de ce délai n'est plus bloquante
+  # pour de nouvelles invitations (l'invitee n'a probablement jamais reçu la modal).
+  TTL = 5.minutes
+
+  scope :active_pending, -> { pending.where("created_at >= ?", TTL.ago) }
+
   validates :inviter, :invitee, presence: true
   validate :invitee_not_inviter
 
